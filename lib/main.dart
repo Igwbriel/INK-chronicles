@@ -18,7 +18,7 @@ class DataService {
   Future<void> carregarCervejas() async {
     var beersUri = Uri(
         scheme: 'https',
-        host: 'random-data-api.com',
+        host: 'http://comicvine.gamespot.com/api',
         path: 'api/beer/random_beer',
         queryParameters: {'size': '5'});
     print('carregarCervejas #1 - antes do await');
@@ -66,6 +66,8 @@ void main() {
   MyApp app = MyApp();
   runApp(app);
 }
+
+class Homepage extends
 
 class MyApp extends StatelessWidget {
   @override
