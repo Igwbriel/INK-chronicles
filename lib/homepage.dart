@@ -6,6 +6,7 @@ class Homepage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(primarySwatch: Colors.deepPurple),
       home: Scaffold(
         backgroundColor: Color.fromARGB(255, 46, 46, 46),
         appBar: AppBar(
