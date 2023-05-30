@@ -17,7 +17,7 @@ class DataService {
   Future<void> carregarCervejas() async {
     var beersUri = Uri(
         scheme: 'https',
-        host: 'http://comicvine.gamespot.com/api',
+        host: 'random-data-api.com',
         path: 'api/beer/random_beer',
         queryParameters: {'size': '5'});
     print('carregarCervejas #1 - antes do await');
