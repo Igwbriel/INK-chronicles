@@ -15,7 +15,7 @@ class DataService {
 
   var chaves = ["name", "style", "ibu"];
   var colunas = ["Nome", "Estilo", "IBU"];
-  var quantidadeItens = '0';
+  var quantidadeItens = 0;
 
   void columnCervejas() {
     chaves = ["name", "style", "ibu"];
@@ -28,8 +28,8 @@ class DataService {
   }
 
   void columnCafes() {
-    chaves = ["blend_name", "origin", "intensifier"];
-    colunas = ["Nome da mistura", "Origem", "Intensidade"];
+    chaves = ["name"];
+    colunas = ["Nome"];
   }
 
   void columnNacoes() {
@@ -52,24 +52,28 @@ class DataService {
     funcoes[index]();
   }
 
-  void carregarCafes() {
-    columnCafes();
-    var coffeesUri = Uri(
-        scheme: 'https',
-        host: 'random-data-api.com',
-        path: 'api/coffee/random_coffee',
-        queryParameters: {'size': quantidadeItens});
+ void carregarCafes() {
+  columnCafes();
+  var coffeesUri = Uri(
+      scheme: 'https',
+      host: 'comicvine.gamespot.com',
+      path: 'api/characters',
+      queryParameters: {
+        'limit': quantidadeItens.toString(),
+        'api_key': '75504a0c3fdb9bb78d69b682d9e39fa478d71195',
+        'format': 'json'
+      });
 
-    http.read(coffeesUri).then((jsonString) {
-      var coffeesJson = jsonDecode(jsonString);
+  http.read(coffeesUri).then((jsonString) {
+    var coffeesJson = jsonDecode(jsonString)['results'];
 
-      tableStateNotifier.value = {
-        'status': TableStatus.ready,
-        'dataObjects': coffeesJson,
-        'propertyNames': ["blend_name", "origin", "intensifier"]
-      };
-    });
-  }
+    tableStateNotifier.value = {
+      'status': TableStatus.ready,
+      'dataObjects': coffeesJson,
+      'propertyNames': ["name", "origin", "intensifier"]
+    };
+  });
+}
 
   void carregarUsers() {
     columnUsers();
@@ -212,19 +216,19 @@ class Apis extends StatelessWidget {
             children: [
               ElevatedButton(
                 onPressed: () {
-                  dataService.quantidadeItens = '5';
+                  dataService.quantidadeItens = 5;
                 },
                 child: Text("5"),
               ),
               ElevatedButton(
                 onPressed: () {
-                  dataService.quantidadeItens = '10';
+                  dataService.quantidadeItens = 10;
                 },
                 child: Text("10"),
               ),
               ElevatedButton(
                 onPressed: () {
-                  dataService.quantidadeItens = '15';
+                  dataService.quantidadeItens = 15;
                 },
                 child: Text("15"),
               ),
