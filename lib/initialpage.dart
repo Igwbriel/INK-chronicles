@@ -7,6 +7,8 @@ import 'package:http/http.dart' as http;
 
 import 'dart:convert';
 
+import 'package:ink_chronicles/matrial/material_color.dart';
+
 enum TableStatus { idle, loading, ready, error }
 
 class DataService {
@@ -15,7 +17,7 @@ class DataService {
 
   var chaves = ["name", "style", "ibu"];
   var colunas = ["Nome", "Estilo", "IBU"];
-  var quantidadeItens = 0;
+  var quantidadeItens = 5;
 
   void columnCervejas() {
     chaves = ["name", "style", "ibu"];
@@ -27,9 +29,9 @@ class DataService {
     colunas = ["Nome", "Sobrenome", "E-mail"];
   }
 
-  void columnCafes() {
-    chaves = ["name"];
-    colunas = ["Nome"];
+  void columnCharacters() {
+    chaves = ["name", "origin", "publisher"];
+    colunas = ["Nome", "Origem", "Publicadora"];
   }
 
   void columnNacoes() {
@@ -39,7 +41,7 @@ class DataService {
 
   void carregar(index) {
     final funcoes = [
-      carregarCafes,
+      carregarCharacters,
       carregarCervejas,
       carregarNacoes,
       carregarUsers
@@ -52,25 +54,34 @@ class DataService {
     funcoes[index]();
   }
 
-  void carregarCafes() {
-    columnCafes();
-    var coffeesUri = Uri(
-        scheme: 'https',
-        host: 'comicvine.gamespot.com',
-        path: 'api/characters',
-        queryParameters: {
-          'limit': quantidadeItens.toString(),
-          'api_key': '75504a0c3fdb9bb78d69b682d9e39fa478d71195',
-          'format': 'json'
-        });
+  void carregarCharacters() {
+    columnCharacters();
+    var charactersUri = Uri(
+      scheme: 'https',
+      host: 'comicvine.gamespot.com',
+      path: 'api/characters',
+      queryParameters: {
+        'limit': quantidadeItens.toString(),
+        'api_key': '75504a0c3fdb9bb78d69b682d9e39fa478d71195',
+        'format': 'json'
+      },
+    );
 
-    http.read(coffeesUri).then((jsonString) {
-      var coffeesJson = jsonDecode(jsonString)['results'];
+    http.read(charactersUri).then((jsonString) {
+      var charactersJson = jsonDecode(jsonString)['results'];
+
+      var extractedCoffeesJson = charactersJson
+          .map((character) => {
+                'name': character['name'],
+                'origin': character['origin']['name'],
+                'publisher': character['publisher']['name'],
+              })
+          .toList();
 
       tableStateNotifier.value = {
         'status': TableStatus.ready,
-        'dataObjects': coffeesJson,
-        'propertyNames': ["name", "origin", "intensifier"]
+        'dataObjects': extractedCoffeesJson,
+        'propertyNames': ["name", "origin", "publisher"],
       };
     });
   }
@@ -139,14 +150,14 @@ class Apis extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          primarySwatch: Colors.deepPurple,
+          primarySwatch: black,
           bottomNavigationBarTheme: BottomNavigationBarThemeData(
-            selectedItemColor: Colors.purple,
-            unselectedItemColor: Colors.purple.withOpacity(0.5),
+            selectedItemColor: black,
+            unselectedItemColor: black.withOpacity(0.5),
           ),
         ),
-        debugShowCheckedModeBanner: false,
         home: Scaffold(
           appBar: AppBar(
             title: const Text("Receita: 7/8"),
@@ -259,8 +270,8 @@ class NewNavBar extends HookWidget {
         currentIndex: state.value,
         items: const [
           BottomNavigationBarItem(
-            label: "Cafés",
-            icon: Icon(Icons.coffee_outlined),
+            label: "Personagens",
+            icon: Icon(Icons.person),
           ),
           BottomNavigationBarItem(
               label: "Cervejas", icon: Icon(Icons.local_drink_outlined)),
@@ -302,7 +313,7 @@ class DataTableWidget extends StatelessWidget {
             (obj) => DataRow(
               cells: propertyNames
                   .map(
-                    (propName) => DataCell(Text(obj[propName])),
+                    (propName) => DataCell(Text(obj[propName].toString())),
                   )
                   .toList(),
             ),
