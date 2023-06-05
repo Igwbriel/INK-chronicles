@@ -21,14 +21,12 @@ class DataService {
 
   void columnTeams() {
     chaves = ["name", "first_appeared_in_issue", "publisher"];
-    colunas = ["Nome", "Primeira aparição", "Publicadora"];
+    colunas = ["Nome", "Primeira aparição", "Editora"];
   }
 
-  
-
   void columnCharacters() {
-    chaves = ["name", "origin", "publisher"];
-    colunas = ["Nome", "Origem", "Publicadora"];
+    chaves = ["name", "origin", "publisher", "image"];
+    colunas = ["Nome", "Origem", "Editora", "perfil"];
   }
 
   void columnPublishers() {
@@ -36,14 +34,11 @@ class DataService {
     colunas = ["Nome", "Estado", "Cidade"];
   }
 
-
-
   void carregar(index) {
     final funcoes = [
       carregarCharacters,
       carregarTeams,
       carregarPublishers,
-
     ];
     tableStateNotifier.value = {
       'status': TableStatus.loading,
@@ -74,20 +69,17 @@ class DataService {
                 'name': character['name'],
                 'origin': character['origin']['name'],
                 'publisher': character['publisher']['name'],
+                'image': character['image']['icon_url']
               })
           .toList();
 
       tableStateNotifier.value = {
         'status': TableStatus.ready,
         'dataObjects': extractedCharactersJson,
-        'propertyNames': ["name", "origin", "publisher"],
+        'propertyNames': ["name", "origin", "publisher", "image"],
       };
     });
   }
-
-  
-
-
 
   void carregarTeams() {
     columnTeams();
@@ -105,11 +97,13 @@ class DataService {
       var teamsJson = jsonDecode(jsonString)['results'];
 
       var extractedTeamsJson = teamsJson
-      .map((team)=>{
-        'name': team['name'],
-        'first_appeared_in_issue': team['first_appeared_in_issue']['name'],
-        'publisher': team['publisher']['name'],
-      }).toList();
+          .map((team) => {
+                'name': team['name'],
+                'first_appeared_in_issue': team['first_appeared_in_issue']
+                    ['name'],
+                'publisher': team['publisher']['name'],
+              })
+          .toList();
 
       tableStateNotifier.value = {
         'status': TableStatus.ready,
@@ -118,7 +112,6 @@ class DataService {
       };
     });
   }
-
 
   void carregarPublishers() {
     columnPublishers();
@@ -136,11 +129,12 @@ class DataService {
       var publishersJson = jsonDecode(jsonString)['results'];
 
       var extractedPublishersJson = publishersJson
-      .map((publisher)=>{
-        'name': publisher['name'],
-        'location_state': publisher['location_state'],
-        'location_city': publisher['location_city'],
-      }).toList();
+          .map((publisher) => {
+                'name': publisher['name'],
+                'location_state': publisher['location_state'],
+                'location_city': publisher['location_city'],
+              })
+          .toList();
 
       tableStateNotifier.value = {
         'status': TableStatus.ready,
@@ -280,10 +274,8 @@ class NewNavBar extends HookWidget {
             label: "Personagens",
             icon: Icon(Icons.person),
           ),
-          BottomNavigationBarItem(
-              label: "Times", icon: Icon(Icons.group)),
-          BottomNavigationBarItem(
-              label: "Publicadoras", icon: Icon(Icons.house)),
+          BottomNavigationBarItem(label: "Times", icon: Icon(Icons.group)),
+          BottomNavigationBarItem(label: "Editoras", icon: Icon(Icons.house)),
         ]);
   }
 }
@@ -292,10 +284,11 @@ class DataTableWidget extends StatelessWidget {
   final List jsonObjects;
   final List<String> columnNames;
   final List<String> propertyNames;
+
   DataTableWidget({
     this.jsonObjects = const [],
     this.columnNames = const [],
-    this.propertyNames = const ["name", "style", "ibu"],
+    this.propertyNames = const ["name", "origin", "publisher", "image"],
   });
 
   @override
@@ -318,7 +311,11 @@ class DataTableWidget extends StatelessWidget {
             (obj) => DataRow(
               cells: propertyNames
                   .map(
-                    (propName) => DataCell(Text(obj[propName].toString())),
+                    (propName) => propName == 'image'
+                        ? DataCell(
+                            Image.network(obj[propName].toString()),
+                          )
+                        : DataCell(Text(obj[propName].toString())),
                   )
                   .toList(),
             ),
