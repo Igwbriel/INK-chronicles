@@ -19,32 +19,31 @@ class DataService {
   var colunas = ["Nome", "Estilo", "IBU"];
   var quantidadeItens = 5;
 
-  void columnCervejas() {
-    chaves = ["name", "style", "ibu"];
-    colunas = ["Nome", "Estilo", "IBU"];
+  void columnTeams() {
+    chaves = ["name", "first_appeared_in_issue", "publisher"];
+    colunas = ["Nome", "Primeira aparição", "Publicadora"];
   }
 
-  void columnUsers() {
-    chaves = ["first_name", "last_name", "email"];
-    colunas = ["Nome", "Sobrenome", "E-mail"];
-  }
+  
 
   void columnCharacters() {
     chaves = ["name", "origin", "publisher"];
     colunas = ["Nome", "Origem", "Publicadora"];
   }
 
-  void columnNacoes() {
-    chaves = ["nationality", "capital", "language"];
-    colunas = ["Nacionalidade", "Capital", "Linguagem"];
+  void columnPublishers() {
+    chaves = ["name", "location_state", "location_city"];
+    colunas = ["Nome", "Estado", "Cidade"];
   }
+
+
 
   void carregar(index) {
     final funcoes = [
       carregarCharacters,
-      carregarCervejas,
-      carregarNacoes,
-      carregarUsers
+      carregarTeams,
+      carregarPublishers,
+
     ];
     tableStateNotifier.value = {
       'status': TableStatus.loading,
@@ -70,7 +69,7 @@ class DataService {
     http.read(charactersUri).then((jsonString) {
       var charactersJson = jsonDecode(jsonString)['results'];
 
-      var extractedCoffeesJson = charactersJson
+      var extractedCharactersJson = charactersJson
           .map((character) => {
                 'name': character['name'],
                 'origin': character['origin']['name'],
@@ -80,65 +79,73 @@ class DataService {
 
       tableStateNotifier.value = {
         'status': TableStatus.ready,
-        'dataObjects': extractedCoffeesJson,
+        'dataObjects': extractedCharactersJson,
         'propertyNames': ["name", "origin", "publisher"],
       };
     });
   }
 
-  void carregarUsers() {
-    columnUsers();
-    var usersUri = Uri(
-        scheme: 'https',
-        host: 'random-data-api.com',
-        path: '/api/v2/users',
-        queryParameters: {'size': quantidadeItens});
+  
 
-    http.read(usersUri).then((jsonString) {
-      var usersJson = jsonDecode(jsonString);
+
+
+  void carregarTeams() {
+    columnTeams();
+    var teamsUri = Uri(
+        scheme: 'https',
+        host: 'comicvine.gamespot.com',
+        path: 'api/teams',
+        queryParameters: {
+          'limit': quantidadeItens.toString(),
+          'api_key': '75504a0c3fdb9bb78d69b682d9e39fa478d71195',
+          'format': 'json'
+        });
+
+    http.read(teamsUri).then((jsonString) {
+      var teamsJson = jsonDecode(jsonString)['results'];
+
+      var extractedTeamsJson = teamsJson
+      .map((team)=>{
+        'name': team['name'],
+        'first_appeared_in_issue': team['first_appeared_in_issue']['name'],
+        'publisher': team['publisher']['name'],
+      }).toList();
 
       tableStateNotifier.value = {
         'status': TableStatus.ready,
-        'dataObjects': usersJson,
-        'propertyNames': ["first_name", "last_name", "email"]
+        'dataObjects': extractedTeamsJson,
+        'propertyNames': ["name", "first_appeared_in_issue", "publisher"]
       };
     });
   }
 
-  void carregarNacoes() {
-    columnNacoes();
-    var nationsUri = Uri(
-        scheme: 'https',
-        host: 'random-data-api.com',
-        path: 'api/nation/random_nation',
-        queryParameters: {'size': quantidadeItens});
 
-    http.read(nationsUri).then((jsonString) {
-      var nationsJson = jsonDecode(jsonString);
+  void carregarPublishers() {
+    columnPublishers();
+    var publishersUri = Uri(
+        scheme: 'https',
+        host: 'comicvine.gamespot.com',
+        path: 'api/publishers',
+        queryParameters: {
+          'limit': quantidadeItens.toString(),
+          'api_key': '75504a0c3fdb9bb78d69b682d9e39fa478d71195',
+          'format': 'json'
+        });
+
+    http.read(publishersUri).then((jsonString) {
+      var publishersJson = jsonDecode(jsonString)['results'];
+
+      var extractedPublishersJson = publishersJson
+      .map((publisher)=>{
+        'name': publisher['name'],
+        'location_state': publisher['location_state'],
+        'location_city': publisher['location_city'],
+      }).toList();
 
       tableStateNotifier.value = {
         'status': TableStatus.ready,
-        'dataObjects': nationsJson,
-        'propertyNames': ["nationality", "capital", "language"]
-      };
-    });
-  }
-
-  void carregarCervejas() {
-    columnCervejas();
-    var beersUri = Uri(
-        scheme: 'https',
-        host: 'random-data-api.com',
-        path: 'api/beer/random_beer',
-        queryParameters: {'size': quantidadeItens});
-
-    http.read(beersUri).then((jsonString) {
-      var beersJson = jsonDecode(jsonString);
-
-      tableStateNotifier.value = {
-        'status': TableStatus.ready,
-        'dataObjects': beersJson,
-        'propertyNames': ["name", "style", "ibu"]
+        'dataObjects': extractedPublishersJson,
+        'propertyNames': ["name", "location_state", "location_city"]
       };
     });
   }
@@ -160,7 +167,7 @@ class Apis extends StatelessWidget {
         ),
         home: Scaffold(
           appBar: AppBar(
-            title: const Text("Receita: 7/8"),
+            title: const Text("INK-CHRONICLES"),
           ),
           body: ValueListenableBuilder(
               valueListenable: dataService.tableStateNotifier,
@@ -274,11 +281,9 @@ class NewNavBar extends HookWidget {
             icon: Icon(Icons.person),
           ),
           BottomNavigationBarItem(
-              label: "Cervejas", icon: Icon(Icons.local_drink_outlined)),
+              label: "Times", icon: Icon(Icons.group)),
           BottomNavigationBarItem(
-              label: "Nações", icon: Icon(Icons.flag_outlined)),
-          BottomNavigationBarItem(
-              label: "Usuários", icon: Icon(Icons.local_phone_outlined))
+              label: "Publicadoras", icon: Icon(Icons.house)),
         ]);
   }
 }
