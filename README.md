@@ -21,7 +21,7 @@ os integrantes do grupo são:
  - https://github.com/ericmadson
 
 <div align = "center">
-  <img src = "https://uploaddeimagens.com.br/images/004/494/068/full/inkLogo.png?1685928026" with = "100px"/>
+  <img src = "https://uploaddeimagens.com.br/images/004/494/075/full/inkLogo.png?1685928793" with = "100px"/>
            
  </div>
 
