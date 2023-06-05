@@ -18,7 +18,7 @@ class Homepage extends StatelessWidget {
     },
   );
 
-  @override
+ @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return MaterialApp(
@@ -35,24 +35,54 @@ class Homepage extends StatelessWidget {
               ),
             ),
             Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: <Widget>[
-                  Image.asset('assets/images/inkLogo.png'),
-                  SizedBox(
-                    width: size.width * 0.8,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, 'Initial');
-                      },
-                      child: Text('Entrar', style: TextStyle(fontSize: 50)),
-                      style: ElevatedButton.styleFrom(
-                        padding:
-                            EdgeInsets.symmetric(vertical: 20, horizontal: 40),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    Image.asset('assets/images/inkLogo.png'),
+                    SizedBox(
+                      width: size.width * 0.8,
+                      child: Column(
+                        children: [
+                          TextField(
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white, // Cor de fundo do campo de login
+                              hintText: 'Login',
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          TextField(
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white70, // Cor de fundo do campo de senha
+                              hintText: 'Senha',
+                            ),
+                            obscureText: true, // Oculta o texto digitado (senha)
+                          ),
+                          SizedBox(height: 10),
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.pushNamed(context, 'Initial');
+                            },
+                            child: Text(
+                              'Entrar',
+                              style: TextStyle(fontSize: 50),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              primary: Colors.black, // Cor de fundo transparente
+                              padding: EdgeInsets.symmetric(vertical: 20, horizontal: 40),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18.0), // Borda arredondada
+                                side: BorderSide(color: Colors.black), // Cor da borda
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],

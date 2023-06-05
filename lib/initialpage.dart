@@ -52,28 +52,28 @@ class DataService {
     funcoes[index]();
   }
 
- void carregarCafes() {
-  columnCafes();
-  var coffeesUri = Uri(
-      scheme: 'https',
-      host: 'comicvine.gamespot.com',
-      path: 'api/characters',
-      queryParameters: {
-        'limit': quantidadeItens.toString(),
-        'api_key': '75504a0c3fdb9bb78d69b682d9e39fa478d71195',
-        'format': 'json'
-      });
+  void carregarCafes() {
+    columnCafes();
+    var coffeesUri = Uri(
+        scheme: 'https',
+        host: 'comicvine.gamespot.com',
+        path: 'api/characters',
+        queryParameters: {
+          'limit': quantidadeItens.toString(),
+          'api_key': '75504a0c3fdb9bb78d69b682d9e39fa478d71195',
+          'format': 'json'
+        });
 
-  http.read(coffeesUri).then((jsonString) {
-    var coffeesJson = jsonDecode(jsonString)['results'];
+    http.read(coffeesUri).then((jsonString) {
+      var coffeesJson = jsonDecode(jsonString)['results'];
 
-    tableStateNotifier.value = {
-      'status': TableStatus.ready,
-      'dataObjects': coffeesJson,
-      'propertyNames': ["name", "origin", "intensifier"]
-    };
-  });
-}
+      tableStateNotifier.value = {
+        'status': TableStatus.ready,
+        'dataObjects': coffeesJson,
+        'propertyNames': ["name", "origin", "intensifier"]
+      };
+    });
+  }
 
   void carregarUsers() {
     columnUsers();
@@ -190,16 +190,17 @@ class Apis extends StatelessWidget {
                     );
 
                   case TableStatus.ready:
-        return SingleChildScrollView(
-          child: Container(
-            padding: EdgeInsets.only(bottom: 60), // Adicionar espaço para os botões
-            child: DataTableWidget(
-              jsonObjects: value['dataObjects'],
-              propertyNames: dataService.chaves,
-              columnNames: dataService.colunas,
-            ),
-          ),
-        );
+                    return SingleChildScrollView(
+                      child: Container(
+                        padding: EdgeInsets.only(
+                            bottom: 60), // Adicionar espaço para os botões
+                        child: DataTableWidget(
+                          jsonObjects: value['dataObjects'],
+                          propertyNames: dataService.chaves,
+                          columnNames: dataService.colunas,
+                        ),
+                      ),
+                    );
 
                   case TableStatus.error:
                     return Text("Lascou");
@@ -212,28 +213,28 @@ class Apis extends StatelessWidget {
           bottomSheet: Container(
             height: 60,
             child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  dataService.quantidadeItens = 5;
-                },
-                child: Text("5"),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  dataService.quantidadeItens = 10;
-                },
-                child: Text("10"),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  dataService.quantidadeItens = 15;
-                },
-                child: Text("15"),
-              ),
-            ],
-          ),
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    dataService.quantidadeItens = 5;
+                  },
+                  child: Text("5"),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    dataService.quantidadeItens = 10;
+                  },
+                  child: Text("10"),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    dataService.quantidadeItens = 15;
+                  },
+                  child: Text("15"),
+                ),
+              ],
+            ),
           ),
         ));
   }
