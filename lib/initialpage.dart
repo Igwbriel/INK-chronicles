@@ -17,7 +17,7 @@ class DataService {
 
   var chaves = ["name", "style", "ibu"];
   var colunas = ["Nome", "Estilo", "IBU"];
-  var quantidadeItens = 5;
+  var quantidadeItens = 22;
 
   void columnTeams() {
     chaves = ["name", "first_appeared_in_issue", "publisher"];
@@ -222,32 +222,7 @@ class Apis extends StatelessWidget {
               }),
           bottomNavigationBar:
               NewNavBar(itemSelectedCallback: dataService.carregar),
-          bottomSheet: Container(
-            height: 60,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    dataService.quantidadeItens = 5;
-                  },
-                  child: Text("5"),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    dataService.quantidadeItens = 10;
-                  },
-                  child: Text("10"),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    dataService.quantidadeItens = 15;
-                  },
-                  child: Text("15"),
-                ),
-              ],
-            ),
-          ),
+          
         ));
   }
 }
