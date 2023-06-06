@@ -1,25 +1,39 @@
-# INK_chronicles
+# INK-chronicles
+Esse projeto utilizando API's foi idealizado para a máteria de Programação orientada à objetos, utilizando a Comic Vine API (https://comicvine.gamespot.com/api/).
 
-Projeto dedicado a matéria: DCT1107 - PROGRAMAÇÃO ORIENTADA A OBJETOS I
+# Como rodar
 
-período: 2023.1
+Para entrar no maior deposito imaginativo do mundo, primeiro clone o projeto usando:
 
-do curso: 	SISTEMAS DE INFORMAÇÃO/CERES - CAICÓ - BACHARELADO - MT
+```bash
+  https://github.com/Igwbriel/INK-chronicles.git
+```
 
-da instituição: UFRN/CERES/Caicó
+Em seguida, pouse no repositório do projeto, usando:
 
-Descrição: o projeto tem como objetivo a criação de um aplicativo em Dart/Flutter que consome uma API.
+```bash
+  cd INK-chronicles
+```
+Heróis precisam de poderes, e nosso projeto das dependências. instale-as usando 
 
-a API escolhida foi: https://comicvine.gamespot.com/api/
+```bash
+  flutter pub get
+```
+Tudo pronto, agora é só rodar o projeto pra entrar no mundo das crônicas de tinta:
 
-os integrantes do grupo são: 
+```bash
+  flutter run 
+```
+## Autores
 
- - https://github.com/Igwbriel
+• https://github.com/Igwbriel
 
- - https://github.com/Gedsonfa
+• https://github.com/Gedsonfa
 
- - https://github.com/ericmadson
+• https://github.com/ericmadson
 
+
+![Logo](https://camo.githubusercontent.com/b6d2d66adc138025ea9cdf8444cdc29a588c98d062c263f8651ba6b7ad46fef0/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f466c75747465722d2532333032353639422e7376673f7374796c653d666f722d7468652d6261646765266c6f676f3d466c7574746572266c6f676f436f6c6f723d7768697465)
 <div align = "center">
   <img src = "https://uploaddeimagens.com.br/images/004/494/075/full/inkLogo.png?1685928793" with = "100px"/>
            
