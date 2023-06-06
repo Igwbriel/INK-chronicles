@@ -20,8 +20,8 @@ class DataService {
   var quantidadeItens = 5;
 
   void columnTeams() {
-    chaves = ["name", "first_appeared_in_issue", "publisher"];
-    colunas = ["Nome", "Primeira aparição", "Editora"];
+    chaves = ["name", "first_appeared_in_issue", "publisher", "image"];
+    colunas = ["Nome", "Primeira aparição", "Editora", "logo"];
   }
 
   void columnCharacters() {
@@ -30,8 +30,8 @@ class DataService {
   }
 
   void columnPublishers() {
-    chaves = ["name", "location_state", "location_city"];
-    colunas = ["Nome", "Estado", "Cidade"];
+    chaves = ["name", "location_state", "location_city", "image"];
+    colunas = ["Nome", "Estado", "Cidade", "Logo"];
   }
 
   void carregar(index) {
@@ -102,13 +102,19 @@ class DataService {
                 'first_appeared_in_issue': team['first_appeared_in_issue']
                     ['name'],
                 'publisher': team['publisher']['name'],
+                'image': team['image']['icon_url']
               })
           .toList();
 
       tableStateNotifier.value = {
         'status': TableStatus.ready,
         'dataObjects': extractedTeamsJson,
-        'propertyNames': ["name", "first_appeared_in_issue", "publisher"]
+        'propertyNames': [
+          "name",
+          "first_appeared_in_issue",
+          "publisher",
+          "image"
+        ]
       };
     });
   }
@@ -133,13 +139,14 @@ class DataService {
                 'name': publisher['name'],
                 'location_state': publisher['location_state'],
                 'location_city': publisher['location_city'],
+                'image': publisher['image']['icon_url']
               })
           .toList();
 
       tableStateNotifier.value = {
         'status': TableStatus.ready,
         'dataObjects': extractedPublishersJson,
-        'propertyNames': ["name", "location_state", "location_city"]
+        'propertyNames': ["name", "location_state", "location_city", "image"]
       };
     });
   }
@@ -274,7 +281,7 @@ class NewNavBar extends HookWidget {
             label: "Personagens",
             icon: Icon(Icons.person),
           ),
-          BottomNavigationBarItem(label: "Times", icon: Icon(Icons.group)),
+          BottomNavigationBarItem(label: "Equipes", icon: Icon(Icons.group)),
           BottomNavigationBarItem(label: "Editoras", icon: Icon(Icons.house)),
         ]);
   }
