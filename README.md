@@ -1,25 +1,26 @@
 # INK-chronicles
 Esse projeto utilizando API's foi idealizado para a máteria de Programação orientada à objetos, utilizando a Comic Vine API (https://comicvine.gamespot.com/api/).
 
-# Como rodar
+# Como rodar 🦸
 
-Para entrar no maior deposito imaginativo do mundo, primeiro clone o projeto usando:
-
+## Passo 1
+Para entrar no maior depósito imaginativo do mundo, clone o projeto usando:
 ```bash
   https://github.com/Igwbriel/INK-chronicles.git
 ```
-
+## Passo 2
 Em seguida, pouse no repositório do projeto, usando:
-
 ```bash
   cd INK-chronicles
 ```
-Heróis precisam de poderes, e nosso projeto das dependências. instale-as usando 
+## Passo 3
+Heróis precisam de poderes, e nosso projeto das dependências. instale-as usando:
 
 ```bash
   flutter pub get
 ```
-Tudo pronto, agora é só rodar o projeto pra entrar no mundo das crônicas de tinta:
+## Passo 4
+Tudo pronto, agora é só rodar o projeto pra entrar no mundo das crônicas de tinta, usando:
 
 ```bash
   flutter run 
