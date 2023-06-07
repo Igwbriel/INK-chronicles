@@ -9,6 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_gif: ^0.0.4
   flutter_hooks: ^0.18.6
   http: ^0.13.6
 
@@ -22,3 +23,4 @@ flutter:
 
   assets:
     - assets/images/inkLogo.png
+    - assets/images/loading_animation.gif

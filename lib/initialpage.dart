@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'package:flutter_hooks/flutter_hooks.dart';
-
 import 'package:http/http.dart' as http;
-
 import 'dart:convert';
-
-import 'package:ink_chronicles/matrial/material_color.dart';
 
 enum TableStatus { idle, loading, ready, error }
 
@@ -158,119 +153,122 @@ class Apis extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primarySwatch: black,
-          bottomNavigationBarTheme: BottomNavigationBarThemeData(
-            selectedItemColor: black,
-            unselectedItemColor: black.withOpacity(0.5),
-          ),
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primaryColor: Colors.red,
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          selectedItemColor: Colors.black,
+          unselectedItemColor: Colors.black.withOpacity(0.5),
         ),
-        home: Scaffold(
-          appBar: AppBar(
-            title: const Text("INK-CHRONICLES"),
-          ),
-          body: ValueListenableBuilder(
-              valueListenable: dataService.tableStateNotifier,
-              builder: (_, value, __) {
-                switch (value['status']) {
-                  case TableStatus.idle:
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            'assets/images/inkLogo.png',
-                            width: 200.0,
-                          ),
-                          SizedBox(
-                            height: 16.0,
-                          ),
-                          Text(
-                            "Selecione um dos botões roxos para receber a quantiade de dados, e abaixo",
-                            style: TextStyle(
-                                fontSize: 20.0,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            "um botão com o conteúdo de uma API correspondente!",
-                            style: TextStyle(
-                                fontSize: 20.0,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ],
+      ),
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text("INK-CHRONICLES"),
+        ),
+        body: ValueListenableBuilder(
+          valueListenable: dataService.tableStateNotifier,
+          builder: (_, value, __) {
+            switch (value['status']) {
+              case TableStatus.idle:
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/images/inkLogo.png',
+                        width: 200.0,
                       ),
-                    );
-                  case TableStatus.loading:
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
-
-                  case TableStatus.ready:
-                    return SingleChildScrollView(
-                      child: Container(
-                        padding: EdgeInsets.only(
-                            bottom: 60), // Adicionar espaço para os botões
-                        child: DataTableWidget(
-                          jsonObjects: value['dataObjects'],
-                          propertyNames: dataService.chaves,
-                          columnNames: dataService.colunas,
+                      SizedBox(height: 16.0),
+                      Text(
+                        "Selecione um dos botões roxos para receber a quantidade de dados, e abaixo",
+                        style: TextStyle(
+                          fontSize: 20.0,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    );
-
-                  case TableStatus.error:
-                    return Text("Lascou");
-                }
-
-                return Text("...");
-              }),
-          bottomNavigationBar:
-              NewNavBar(itemSelectedCallback: dataService.carregar),
-          
-        ));
+                      Text(
+                        "um botão com o conteúdo de uma API correspondente!",
+                        style: TextStyle(
+                          fontSize: 20.0,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              case TableStatus.loading:
+                return Center(
+                  child: Image.asset(
+                    'assets/images/loading_animation.gif',
+                    width: 400.0,
+                  ),
+                );
+              case TableStatus.ready:
+                return SingleChildScrollView(
+                  child: Container(
+                    padding: EdgeInsets.only(
+                      bottom: 60,
+                    ),
+                    child: DataTableWidget(
+                      jsonObjects: value['dataObjects'],
+                      propertyNames: dataService.chaves,
+                      columnNames: dataService.colunas,
+                    ),
+                  ),
+                );
+              case TableStatus.error:
+                return Text("Lascou");
+            }
+            return Text("...");
+          },
+        ),
+        bottomNavigationBar:
+            NewNavBar(itemSelectedCallback: dataService.carregar),
+      ),
+    );
   }
 }
 
 class NewNavBar extends HookWidget {
-  final _itemSelectedCallback;
+  final _itemNames = ['Personagens', 'Times', 'Editoras'];
+  final _itemIcons = [Icons.person, Icons.group, Icons.house];
 
-  NewNavBar({itemSelectedCallback})
-      : _itemSelectedCallback = itemSelectedCallback ?? (int) {}
+  final Function(int) itemSelectedCallback;
+
+  NewNavBar({required this.itemSelectedCallback});
 
   @override
   Widget build(BuildContext context) {
-    var state = useState(1);
+    final selectedItem = useState(0);
 
     return BottomNavigationBar(
-        onTap: (index) {
-          state.value = index;
-
-          _itemSelectedCallback(index);
-        },
-        currentIndex: state.value,
-        items: const [
-          BottomNavigationBarItem(
-            label: "Personagens",
-            icon: Icon(Icons.person),
-          ),
-          BottomNavigationBarItem(label: "Equipes", icon: Icon(Icons.group)),
-          BottomNavigationBarItem(label: "Editoras", icon: Icon(Icons.house)),
-        ]);
+      items: List.generate(
+        _itemNames.length,
+        (index) => BottomNavigationBarItem(
+          icon: Icon(_itemIcons[index]),
+          label: _itemNames[index],
+        ),
+      ),
+      currentIndex: selectedItem.value,
+      onTap: (index) {
+        selectedItem.value = index;
+        itemSelectedCallback(index);
+      },
+    );
   }
 }
 
 class DataTableWidget extends StatelessWidget {
-  final List jsonObjects;
-  final List<String> columnNames;
+  final List<dynamic> jsonObjects;
   final List<String> propertyNames;
+  final List<String> columnNames;
 
   DataTableWidget({
-    this.jsonObjects = const [],
-    this.columnNames = const [],
-    this.propertyNames = const ["name", "origin", "publisher", "image"],
+    required this.jsonObjects,
+    required this.propertyNames,
+    required this.columnNames,
   });
 
   @override
@@ -279,25 +277,20 @@ class DataTableWidget extends StatelessWidget {
       columns: columnNames
           .map(
             (name) => DataColumn(
-              label: Expanded(
-                child: Text(
-                  name,
-                  style: TextStyle(fontStyle: FontStyle.italic),
-                ),
-              ),
+              label: Text(name),
             ),
           )
           .toList(),
       rows: jsonObjects
           .map(
-            (obj) => DataRow(
+            (jsonObject) => DataRow(
               cells: propertyNames
                   .map(
-                    (propName) => propName == 'image'
-                        ? DataCell(
-                            Image.network(obj[propName].toString()),
-                          )
-                        : DataCell(Text(obj[propName].toString())),
+                    (property) => DataCell(
+                      property == 'image'
+                          ? Image.network(jsonObject[property])
+                          : Text(jsonObject[property].toString()),
+                    ),
                   )
                   .toList(),
             ),
@@ -305,4 +298,8 @@ class DataTableWidget extends StatelessWidget {
           .toList(),
     );
   }
+}
+
+void main() {
+  runApp(Apis());
 }
