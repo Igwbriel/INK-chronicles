@@ -155,15 +155,17 @@ class Apis extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primaryColor: Colors.black,
         bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          selectedItemColor: Colors.black,
-          unselectedItemColor: Colors.black.withOpacity(0.5),
+          selectedItemColor: Colors.red,
+          unselectedItemColor: Colors.red.withOpacity(0.5),
         ),
       ),
       home: Scaffold(
         appBar: AppBar(         
-          title: const Text("INK-CHRONICLES"),
+          title: const Text("INK-CHRONICLES",
+          style: TextStyle(
+            color: Colors.black,
+          ),),
           backgroundColor: Colors.blue,
           
         ),
