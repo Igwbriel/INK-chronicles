@@ -155,15 +155,17 @@ class Apis extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primaryColor: Colors.red,
+        primaryColor: Colors.black,
         bottomNavigationBarTheme: BottomNavigationBarThemeData(
           selectedItemColor: Colors.black,
           unselectedItemColor: Colors.black.withOpacity(0.5),
         ),
       ),
       home: Scaffold(
-        appBar: AppBar(
+        appBar: AppBar(         
           title: const Text("INK-CHRONICLES"),
+          backgroundColor: Colors.blue,
+          
         ),
         body: ValueListenableBuilder(
           valueListenable: dataService.tableStateNotifier,
@@ -179,22 +181,7 @@ class Apis extends StatelessWidget {
                         width: 200.0,
                       ),
                       SizedBox(height: 16.0),
-                      Text(
-                        "Selecione um dos botões roxos para receber a quantidade de dados, e abaixo",
-                        style: TextStyle(
-                          fontSize: 20.0,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        "um botão com o conteúdo de uma API correspondente!",
-                        style: TextStyle(
-                          fontSize: 20.0,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      
                     ],
                   ),
                 );
@@ -301,5 +288,6 @@ class DataTableWidget extends StatelessWidget {
 }
 
 void main() {
+  
   runApp(Apis());
 }
