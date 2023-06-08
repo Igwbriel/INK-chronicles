@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'initialpage.dart';
 import 'homepage.dart';
+import 'search_page.dart';
+
 
 void main() {
   runApp(MyApp());
@@ -12,9 +14,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     
-    return MaterialApp(initialRoute: '/', routes: {
+    return MaterialApp(initialRoute: 'Search', routes: {
       '/': (context) => Homepage(),
       'Initial': (context) => Apis(),
+      'Search': (context)=> SearchBarApp(),
     });
   }
 }
