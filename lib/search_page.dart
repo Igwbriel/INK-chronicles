@@ -73,7 +73,7 @@ class _SearchScreenState extends State<SearchScreen> {
               margin: const EdgeInsets.symmetric(horizontal: 5.0),
               child: Image.network(
                 imageUrl,
-                fit: BoxFit.contain,
+                fit: BoxFit.fill,
               ),
             );
           },
@@ -120,6 +120,7 @@ class _SearchScreenState extends State<SearchScreen> {
           _buildLogo(),
           _buildSearch(),
           _buildCarousel(),
+          
         ],
       ),
     ),

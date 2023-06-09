@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     
-    return MaterialApp(initialRoute: 'Search', routes: {
+    return MaterialApp(initialRoute: 'Initial', routes: {
       '/': (context) => Homepage(),
       'Initial': (context) => Apis(),
       'Search': (context)=> SearchBarApp(),
