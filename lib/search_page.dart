@@ -50,62 +50,13 @@ class _SearchScreenState extends State<SearchScreen> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: <Widget>[
-          Container(
-             height: MediaQuery.of(context).size.height - 395, // Altura disponível para o carrossel
-  child: Column(
-    mainAxisAlignment: MainAxisAlignment.center,
-    crossAxisAlignment: CrossAxisAlignment.center,
-    children: <Widget>[
-      Container(
-        width: 150,
-        height: 150,
-        child: Transform.scale(
-          scale: 1.0,
-          child: Image.asset('assets/images/inkLogo.png'),
-        ),
-      ),
-      Padding(
-        padding: EdgeInsets.all(8.0),
-        child: TextField(
-          onChanged: (value) {
-            _filterSearchResults(value);
-          },
-          decoration: InputDecoration(
-            labelText: 'Search',
-            prefixIcon: Icon(Icons.search),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(25.0)),
-            ),
-          ),
-        ),
-      ),
-      Expanded(
-        child: ListView.builder(
-          itemCount: _filteredData.length,
-          itemBuilder: (BuildContext context, int index) {
-            return ListTile(
-              title: Text(_filteredData[index]),
-            );
-          },
-        ),
-      ),
-    ],
-  ),
-),
-Expanded(
-  flex: 2,
-
-    child: CarouselSlider(
+  Widget _buildCarousel() {
+    return CarouselSlider(
       options: CarouselOptions(
         autoPlay: true,
         aspectRatio: 16 / 9,
         autoPlayCurve: Curves.fastOutSlowIn,
-        autoPlayInterval: Duration(seconds: 5),
+        autoPlayInterval: const Duration(seconds: 5),
         autoPlayAnimationDuration: Duration(milliseconds: 800),
         enableInfiniteScroll: true,
         pauseAutoPlayOnTouch: true,
@@ -116,7 +67,7 @@ Expanded(
           builder: (BuildContext context) {
             return Container(
               width: MediaQuery.of(context).size.width,
-              margin: EdgeInsets.symmetric(horizontal: 5.0),
+              margin: const EdgeInsets.symmetric(horizontal: 5.0),
               child: Image.network(
                 imageUrl,
                 fit: BoxFit.fitWidth,
@@ -125,10 +76,56 @@ Expanded(
           },
         );
       }).toList(),
-    ),
-  ),               
-      
+    );
+  }
 
+  Widget _buildLogo() {
+    return SizedBox(
+      width: 150,
+      height: 150,
+      child: Transform.scale(
+        scale: 1.0,
+        child: Image.asset('assets/images/inkLogo.png'),
+      ),
+    );
+  }
+
+  Widget _buildSearch() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: TextField(
+        onChanged: (value) {
+          _filterSearchResults(value);
+        },
+        decoration: const InputDecoration(
+          labelText: 'Search',
+          prefixIcon: Icon(Icons.search),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(25.0)),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        children: <Widget>[
+          Container(
+            height: MediaQuery.of(context).size.height -
+                395, // Altura disponível para o carrossel
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                _buildLogo(),
+                _buildSearch(),
+              ],
+            ),
+          ),
+          _buildCarousel(),
         ],
       ),
     );
