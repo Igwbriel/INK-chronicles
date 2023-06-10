@@ -184,7 +184,7 @@ class DataService {
 
   void carregarMoreItems() {
     quantidadeItens += 22;
-    carregar(chaves.indexWhere((element) => element != null));
+    carregar(currentIndex); // Utiliza o índice da aba atual
   }
 }
 
@@ -330,6 +330,7 @@ class _InfiniteScrollWidgetState extends State<InfiniteScrollWidget> {
   @override
   void initState() {
     super.initState();
+    currentIndex = widget.currentIndex;
     _scrollController.addListener(_scrollListener);
   }
 
