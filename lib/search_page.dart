@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'matrial/material_color.dart';
+import 'initialpage.dart';
+
 
 
 class SearchBarApp extends StatelessWidget {
-  const SearchBarApp({Key key = const ValueKey('search')}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+    routes: {
+      'Initial': (context) => Apis(),
+      },
       title: 'Search Bar',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: black,
       ),
       home: SearchScreen(),
     );
@@ -128,6 +133,7 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
           onPressed: () {
             // Implemente a funcionalidade para o botão "Character's"
+            Navigator.pushNamed(context, 'Initial');
           },
           child: const Text(
             'Character\'s',
@@ -179,6 +185,7 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
           onPressed: () {
             // Implemente a funcionalidade para o botão "Character's"
+            
           },
           child: const Text(
             'Series',

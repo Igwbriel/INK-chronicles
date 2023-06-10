@@ -52,7 +52,7 @@ class Homepage extends StatelessWidget {
                           SizedBox(height: 10),
                           ElevatedButton(
                             onPressed: () {
-                              Navigator.pushNamed(context, 'Initial');
+                              Navigator.pushNamed(context, 'Search');
                             },
                             child: Text(
                               'Entrar',
