@@ -3,14 +3,12 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'matrial/material_color.dart';
 import 'initialpage.dart';
 
-
-
 class SearchBarApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-    routes: {
-      'Initial': (context) => Apis(),
+      routes: {
+        'Initial': (context) => Apis(),
       },
       title: 'Search Bar',
       theme: ThemeData(
@@ -64,31 +62,31 @@ class _SearchScreenState extends State<SearchScreen> {
       child: Transform.scale(
         scale: 1, //Gabriel mo fi
         child: CarouselSlider(
-        options: CarouselOptions(
-          autoPlay: true,
-          aspectRatio: 16 / 9, //Gabriel mo fi
-          autoPlayCurve: Curves.fastOutSlowIn,
-          autoPlayInterval: const Duration(seconds: 5),
-          autoPlayAnimationDuration: const Duration(milliseconds: 800),
-          enableInfiniteScroll: true,
-          pauseAutoPlayOnTouch: true,
-          scrollDirection: Axis.horizontal,
+          options: CarouselOptions(
+            autoPlay: true,
+            aspectRatio: 16 / 9, //Gabriel mo fi
+            autoPlayCurve: Curves.fastOutSlowIn,
+            autoPlayInterval: const Duration(seconds: 5),
+            autoPlayAnimationDuration: const Duration(milliseconds: 800),
+            enableInfiniteScroll: true,
+            pauseAutoPlayOnTouch: true,
+            scrollDirection: Axis.horizontal,
+          ),
+          items: _imageUrls.map((imageUrl) {
+            return Builder(
+              builder: (BuildContext context) {
+                return Container(
+                  width: MediaQuery.of(context).size.width,
+                  margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                  child: Image.network(
+                    imageUrl,
+                    fit: BoxFit.fill, //Gabriel mo fi
+                  ),
+                );
+              },
+            );
+          }).toList(),
         ),
-        items: _imageUrls.map((imageUrl) {
-          return Builder(
-            builder: (BuildContext context) {
-              return Container(
-                width: MediaQuery.of(context).size.width,
-                margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                child: Image.network(
-                  imageUrl,
-                  fit: BoxFit.fill, //Gabriel mo fi
-                ),
-              );
-            },
-          );
-        }).toList(),
-      ),
       ),
     );
   }
@@ -124,22 +122,18 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Widget _buildButtons() {
   return SizedBox(
-    height: 120, // Defina uma altura adequada para o grid
-    child: GridView.count(
-      crossAxisCount: 5,
-      childAspectRatio: 2.0,
-      padding: const EdgeInsets.all(16.0),
-      mainAxisSpacing: 16.0,
-      crossAxisSpacing: 16.0,
+    height: 50,
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-          ElevatedButton(
+        ElevatedButton(
           style: ElevatedButton.styleFrom(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(200.0), // Define o raio da borda circular
+              borderRadius: BorderRadius.circular(50.0), // Define o raio da borda circular
             ),
           ),
           onPressed: () {
-            // Implemente a funcionalidade para o botão "Character's"
+            // Implemente a funcionalidade para o primeiro botão
             Navigator.pushNamed(context, 'Initial');
           },
           child: const Text(
@@ -149,32 +143,16 @@ class _SearchScreenState extends State<SearchScreen> {
               decoration: TextDecoration.underline,
             ),
           ),
-        ),  
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(200.0), // Define o raio da borda circular
-            ),
-          ),
-          onPressed: () {
-            // Implemente a funcionalidade para o botão "Character's"
-          },
-          child: const Text(
-            'Publisher\'s',
-            style: TextStyle(
-              fontSize: 16.0,
-              decoration: TextDecoration.underline,
-            ),
-          ),
         ),
+        const SizedBox(width: 10), // Espaçamento entre os botões
         ElevatedButton(
           style: ElevatedButton.styleFrom(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(200.0), // Define o raio da borda circular
+              borderRadius: BorderRadius.circular(50.0), // Define o raio da borda circular
             ),
           ),
           onPressed: () {
-            // Implemente a funcionalidade para o botão "Character's"
+            // Implemente a funcionalidade para o segundo botão
           },
           child: const Text(
             'Team\'s',
@@ -184,47 +162,28 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
           ),
         ),
+        const SizedBox(width: 10), // Espaçamento entre os botões
         ElevatedButton(
           style: ElevatedButton.styleFrom(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(200.0), // Define o raio da borda circular
+              borderRadius: BorderRadius.circular(50.0), // Define o raio da borda circular
             ),
           ),
           onPressed: () {
-            // Implemente a funcionalidade para o botão "Character's"
-            
+            // Implemente a funcionalidade para o segundo botão
           },
           child: const Text(
-            'Series',
+            'Publisher\'s',
             style: TextStyle(
               fontSize: 16.0,
               decoration: TextDecoration.underline,
             ),
           ),
         ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(200.0), // Define o raio da borda circular
-            ),
-          ),
-          onPressed: () {
-            // Implemente a funcionalidade para o botão "Character's"
-          },
-          child: const Text(
-            'Volume\'s',
-            style: TextStyle(
-              fontSize: 16.0,
-              decoration: TextDecoration.underline,
-            ),
-          ),
-        ),
-        
       ],
     ),
   );
 }
-
 
 
   @override
