@@ -14,7 +14,7 @@ class DataService {
 
   var chaves = ["name", "style", "ibu"];
   var colunas = ["Nome", "Estilo", "IBU"];
-  var quantidadeItens = 21;
+  var quantidadeItens = 20;
 
   void columnCharacters() {
     currentIndex = 0;
@@ -396,9 +396,13 @@ class DataTableWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final crossAxisCount = screenSize.width < 900 ? 2 : 4;
+    final childAspectRatio = screenSize.width / (screenSize.height * 0.9);
+
     return GridView.count(
-      crossAxisCount: 3,
-      childAspectRatio: 1.7, // Ajuste o valor conforme necessário
+      crossAxisCount: crossAxisCount,
+      childAspectRatio: childAspectRatio,
       physics: NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       children: List.generate(jsonObjects.length, (index) {
