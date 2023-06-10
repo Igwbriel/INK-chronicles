@@ -58,31 +58,38 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildCarousel() {
-    return CarouselSlider(
-      options: CarouselOptions(
-        autoPlay: true,
-        aspectRatio: 15 / 5,
-        autoPlayCurve: Curves.fastOutSlowIn,
-        autoPlayInterval: const Duration(seconds: 5),
-        autoPlayAnimationDuration: const Duration(milliseconds: 800),
-        enableInfiniteScroll: true,
-        pauseAutoPlayOnTouch: true,
-        scrollDirection: Axis.horizontal,
+    return SizedBox(
+      width: 200, //Gabriel mo fi
+      height: 200, //Gabriel mo fi
+      child: Transform.scale(
+        scale: 1, //Gabriel mo fi
+        child: CarouselSlider(
+        options: CarouselOptions(
+          autoPlay: true,
+          aspectRatio: 16 / 9, //Gabriel mo fi
+          autoPlayCurve: Curves.fastOutSlowIn,
+          autoPlayInterval: const Duration(seconds: 5),
+          autoPlayAnimationDuration: const Duration(milliseconds: 800),
+          enableInfiniteScroll: true,
+          pauseAutoPlayOnTouch: true,
+          scrollDirection: Axis.horizontal,
+        ),
+        items: _imageUrls.map((imageUrl) {
+          return Builder(
+            builder: (BuildContext context) {
+              return Container(
+                width: MediaQuery.of(context).size.width,
+                margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.fill, //Gabriel mo fi
+                ),
+              );
+            },
+          );
+        }).toList(),
       ),
-      items: _imageUrls.map((imageUrl) {
-        return Builder(
-          builder: (BuildContext context) {
-            return Container(
-              width: MediaQuery.of(context).size.width,
-              margin: const EdgeInsets.symmetric(horizontal: 5.0),
-              child: Image.network(
-                imageUrl,
-                fit: BoxFit.fill,
-              ),
-            );
-          },
-        );
-      }).toList(),
+      ),
     );
   }
 
