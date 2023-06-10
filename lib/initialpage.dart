@@ -43,63 +43,67 @@ class DataService {
     funcoes[index]();
   }
 
-void carregarCharacters() {
-  columnCharacters();
-  var quantidadeTotal = 103; // Número total de personagens que você deseja obter
-  var quantidadePorPagina = 100; // Número de personagens por página
-  var quantidadePaginas = (quantidadeTotal / quantidadePorPagina).ceil();
+  void carregarCharacters() {
+    columnCharacters();
+    var quantidadeTotal =
+        103; // Número total de personagens que você deseja obter
+    var quantidadePorPagina = 100; // Número de personagens por página
+    var quantidadePaginas = (quantidadeTotal / quantidadePorPagina).ceil();
 
-  List<Map<String, dynamic>> allCharacters = [];
+    List<Map<String, dynamic>> allCharacters = [];
 
-  for (var pagina = 1; pagina <= quantidadePaginas; pagina++) {
-    var charactersUri = Uri(
-      scheme: 'https',
-      host: 'comicvine.gamespot.com',
-      path: 'api/characters',
-      queryParameters: {
-        'limit': quantidadePorPagina.toString(),
-        'offset': ((pagina - 1) * quantidadePorPagina).toString(),
-        'api_key': '75504a0c3fdb9bb78d69b682d9e39fa478d71195',
-        'format': 'json',
-      },
-    );
+    for (var pagina = 1; pagina <= quantidadePaginas; pagina++) {
+      var charactersUri = Uri(
+        scheme: 'https',
+        host: 'comicvine.gamespot.com',
+        path: 'api/characters',
+        queryParameters: {
+          'limit': quantidadePorPagina.toString(),
+          'offset': ((pagina - 1) * quantidadePorPagina).toString(),
+          'api_key': '75504a0c3fdb9bb78d69b682d9e39fa478d71195',
+          'format': 'json',
+        },
+      );
 
-    http.get(charactersUri).then((response) {
-      if (response.statusCode == 200) {
-        var charactersJson = jsonDecode(response.body)['results'];
+      http.get(charactersUri).then((response) {
+        if (response.statusCode == 200) {
+          var charactersJson = jsonDecode(response.body)['results'];
 
-        var extractedCharactersJson = charactersJson
-            .map<Map<String, dynamic>>((character) => {
-                  'name': character['name'] ?? '',
-                  'origin': character['origin'] != null ? character['origin']['name'] : '',
-                  'publisher': character['publisher'] != null ? character['publisher']['name'] : '',
-                  'image': character['image'] != null ? character['image']['icon_url'] : ''
-                })
-            .toList();
+          var extractedCharactersJson = charactersJson
+              .map<Map<String, dynamic>>((character) => {
+                    'name': character['name'] ?? '',
+                    'origin': character['origin'] != null
+                        ? character['origin']['name']
+                        : '',
+                    'publisher': character['publisher'] != null
+                        ? character['publisher']['name']
+                        : '',
+                    'image': character['image'] != null
+                        ? character['image']['icon_url']
+                        : ''
+                  })
+              .toList();
 
-        allCharacters.addAll(extractedCharactersJson);
+          allCharacters.addAll(extractedCharactersJson);
 
-        if (allCharacters.length >= quantidadeTotal) {
-          // Todos os personagens foram obtidos, atualiza o estado da tabela
+          if (allCharacters.length >= quantidadeTotal) {
+            // Todos os personagens foram obtidos, atualiza o estado da tabela
+            tableStateNotifier.value = {
+              'status': TableStatus.ready,
+              'dataObjects': allCharacters,
+              'propertyNames': ["name", "origin", "publisher", "image"],
+            };
+          }
+        } else {
           tableStateNotifier.value = {
-            'status': TableStatus.ready,
-            'dataObjects': allCharacters,
-            'propertyNames': ["name", "origin", "publisher", "image"],
+            'status': TableStatus.error,
+            'dataObjects': [],
+            'propertyNames': [],
           };
         }
-      } else {
-        tableStateNotifier.value = {
-          'status': TableStatus.error,
-          'dataObjects': [],
-          'propertyNames': [],
-        };
-      }
-    });
+      });
+    }
   }
-}
-
-
-
 
   void carregarTeams() {
     columnTeams();
@@ -186,13 +190,14 @@ class Apis extends StatelessWidget {
         ),
       ),
       home: Scaffold(
-        appBar: AppBar(         
-          title: const Text("INK-CHRONICLES",
-          style: TextStyle(
-            color: Colors.black,
-          ),),
+        appBar: AppBar(
+          title: const Text(
+            "INK-CHRONICLES",
+            style: TextStyle(
+              color: Colors.black,
+            ),
+          ),
           backgroundColor: Colors.blue,
-          
         ),
         body: ValueListenableBuilder(
           valueListenable: dataService.tableStateNotifier,
@@ -208,7 +213,6 @@ class Apis extends StatelessWidget {
                         width: 200.0,
                       ),
                       SizedBox(height: 16.0),
-                      
                     ],
                   ),
                 );
@@ -313,4 +317,3 @@ class DataTableWidget extends StatelessWidget {
     );
   }
 }
-

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:carousel_slider/carousel_slider.dart';
-import 'initialpage.dart';
-import 'dart:convert';
+
 
 class SearchBarApp extends StatelessWidget {
+  const SearchBarApp({Key key = const ValueKey('search')}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -26,7 +25,7 @@ class _SearchScreenState extends State<SearchScreen> {
   String _searchText = "";
   List<String> _data = [];
   List<String> _filteredData = [];
-  List<String> _imageUrls = [
+  final List<String> _imageUrls = [
     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRnt_1wHhAK_Pwcld6j63uGIcnq93Xo931giw',
     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvqoGSZ8qg73v8Ogb3Sm7M145zyUdek2LiYw',
     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTyI31daDS2caW9D15Fl8E7Ocbo7pypNYUUyw',
@@ -57,7 +56,7 @@ class _SearchScreenState extends State<SearchScreen> {
     return CarouselSlider(
       options: CarouselOptions(
         autoPlay: true,
-        aspectRatio: 16 / 9,
+        aspectRatio: 15 / 5,
         autoPlayCurve: Curves.fastOutSlowIn,
         autoPlayInterval: const Duration(seconds: 5),
         autoPlayAnimationDuration: const Duration(milliseconds: 800),
@@ -111,19 +110,122 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
+  Widget _buildButtons() {
+  return SizedBox(
+    height: 120, // Defina uma altura adequada para o grid
+    child: GridView.count(
+      crossAxisCount: 5,
+      childAspectRatio: 2.0,
+      padding: const EdgeInsets.all(16.0),
+      mainAxisSpacing: 16.0,
+      crossAxisSpacing: 16.0,
+      children: [
+          ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(200.0), // Define o raio da borda circular
+            ),
+          ),
+          onPressed: () {
+            // Implemente a funcionalidade para o botão "Character's"
+          },
+          child: const Text(
+            'Character\'s',
+            style: TextStyle(
+              fontSize: 16.0,
+              decoration: TextDecoration.underline,
+            ),
+          ),
+        ),  
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(200.0), // Define o raio da borda circular
+            ),
+          ),
+          onPressed: () {
+            // Implemente a funcionalidade para o botão "Character's"
+          },
+          child: const Text(
+            'Publisher\'s',
+            style: TextStyle(
+              fontSize: 16.0,
+              decoration: TextDecoration.underline,
+            ),
+          ),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(200.0), // Define o raio da borda circular
+            ),
+          ),
+          onPressed: () {
+            // Implemente a funcionalidade para o botão "Character's"
+          },
+          child: const Text(
+            'Team\'s',
+            style: TextStyle(
+              fontSize: 16.0,
+              decoration: TextDecoration.underline,
+            ),
+          ),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(200.0), // Define o raio da borda circular
+            ),
+          ),
+          onPressed: () {
+            // Implemente a funcionalidade para o botão "Character's"
+          },
+          child: const Text(
+            'Series',
+            style: TextStyle(
+              fontSize: 16.0,
+              decoration: TextDecoration.underline,
+            ),
+          ),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(200.0), // Define o raio da borda circular
+            ),
+          ),
+          onPressed: () {
+            // Implemente a funcionalidade para o botão "Character's"
+          },
+          child: const Text(
+            'Volume\'s',
+            style: TextStyle(
+              fontSize: 16.0,
+              decoration: TextDecoration.underline,
+            ),
+          ),
+        ),
+        
+      ],
+    ),
+  );
+}
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-      child: Column(
-        children: <Widget>[
-          _buildLogo(),
-          _buildSearch(),
-          _buildCarousel(),
-          
-        ],
+        child: Column(
+          children: <Widget>[
+            _buildLogo(),
+            _buildSearch(),
+            _buildCarousel(),
+            _buildButtons(),
+          ],
+        ),
       ),
-    ),
     );
   }
 }
