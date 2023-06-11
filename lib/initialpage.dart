@@ -14,7 +14,7 @@ class DataService {
 
   var chaves = ["name", "style", "ibu"];
   var colunas = ["Nome", "Estilo", "IBU"];
-  var quantidadeItens = 20;
+  var quantidadeItens = 100;
 
   void columnCharacters() {
     currentIndex = 0;
@@ -183,7 +183,7 @@ class DataService {
   }
 
   void carregarMoreItems() {
-    quantidadeItens += 22;
+    quantidadeItens += 100;
     carregar(currentIndex); // Utiliza o índice da aba atual
   }
 }
