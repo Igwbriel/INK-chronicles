@@ -211,32 +211,39 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
-  Future<void> _fetchImages() async {
-    try {
-      final response = await http.get(Uri.parse(
-          'https://comicvine.gamespot.com/api/characters/?api_key=75504a0c3fdb9bb78d69b682d9e39fa478d71195&format=json'));
+  Map<String, String?> _characterImageMap = {};
 
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = json.decode(response.body);
 
-        final List<dynamic> data = responseData['results'];
-        final List<String> imageUrls = [];
+Future<void> _fetchImages() async {
+  try {
+    final response = await http.get(Uri.parse(
+        'https://comicvine.gamespot.com/api/characters/?api_key=75504a0c3fdb9bb78d69b682d9e39fa478d71195&format=json'));
 
-        for (final item in data) {
-          final String imageUrl = item['image']['icon_url'];
-          imageUrls.add(imageUrl);
-        }
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
 
-        setState(() {
-          _imageUrls = imageUrls;
-        });
-      } else {
-        print('Failed to fetch images: ${response.statusCode}');
+      final List<dynamic> data = responseData['results'];
+      final List<String> imageUrls = [];
+
+      for (final item in data) {
+        final String characterName = item['name'];
+        final String imageUrl = item['image']['icon_url'];
+        imageUrls.add(imageUrl);
+        _characterImageMap[characterName] = imageUrl; // Map character name to image URL
+// Map character name to image URL
       }
-    } catch (e) {
-      print('Failed to fetch images: $e');
+
+      setState(() {
+        _imageUrls = imageUrls;
+      });
+    } else {
+      print('Failed to fetch images: ${response.statusCode}');
     }
+  } catch (e) {
+    print('Failed to fetch images: $e');
   }
+}
+
 
   void _filterSearchResults(String query) {
     List<String> filteredList = [];
@@ -270,7 +277,7 @@ class _SearchScreenState extends State<SearchScreen> {
               autoPlay: true,
               aspectRatio: 16 / 9,
               autoPlayCurve: Curves.fastOutSlowIn,
-              autoPlayInterval: const Duration(seconds: 5),
+              autoPlayInterval: const Duration(seconds: 2),
               autoPlayAnimationDuration: const Duration(milliseconds: 800),
               enableInfiniteScroll: true,
               pauseAutoPlayOnTouch: true,
@@ -353,32 +360,35 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildSearchResults() {
-    if (_filteredData.isEmpty) {
-      return CircularProgressIndicator();
-    } else {
-      return ListView.builder(
-        shrinkWrap: true,
-        itemCount: _filteredData.length,
-        itemBuilder: (BuildContext context, int index) {
-          final String result = _filteredData[index];
-          return GestureDetector(
-            onTap: () {
-              _handleResultSelected(result);
-            },
-            child: ListTile(
-              title: Text(result),
-              leading: Image.network(
-                _imageUrls[
-                    index], // Assuming _imageUrls is populated with image URLs in the same order as _filteredData
-                width: 50,
-                height: 50,
-              ),
-            ),
-          );
-        },
-      );
-    }
+  if (_filteredData.isEmpty) {
+    return CircularProgressIndicator();
+  } else {
+    return ListView.builder(
+      shrinkWrap: true,
+      itemCount: _filteredData.length,
+      itemBuilder: (BuildContext context, int index) {
+        final String result = _filteredData[index];
+        return GestureDetector(
+          onTap: () {
+            _handleResultSelected(result);
+          },
+          child: ListTile(
+            title: Text(result),
+            leading: _characterImageMap[result] != null
+    ? Image.network(
+        _characterImageMap[result]!, // Use the mapped image URL
+        width: 50,
+        height: 50,
+      )
+    : SizedBox(), // Placeholder widget if the image URL is null
+
+          ),
+        );
+      },
+    );
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
