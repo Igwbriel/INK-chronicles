@@ -57,8 +57,9 @@ class ResultDetailPage extends StatelessWidget {
             final publisher = character['publisher'] != null
                 ? character['publisher']['name']
                 : '';
-            final image =
-                character['image'] != null ? character['image']['icon_url'] : '';
+            final image = character['image'] != null
+                ? character['image']['icon_url']
+                : '';
 
             return {
               'name': name,
@@ -137,7 +138,7 @@ class _SearchScreenState extends State<SearchScreen> {
         builder: (context) => ResultDetailPage(result: result),
       ),
     );
-  }  
+  }
 
   void _populateData() async {
     try {
@@ -202,7 +203,6 @@ class _SearchScreenState extends State<SearchScreen> {
 
   void _handleSearchSubmitted(String value) {
     _filterSearchResults(value);
-
   }
 
   Widget _buildCarousel() {
@@ -298,31 +298,30 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildSearchResults() {
-  if (_filteredData.isEmpty) {
-    return Text(
-      'Nenhum resultado encontrado.',
-      style: TextStyle(fontSize: 16.0),
-    );
-  } else {
-    return ListView.builder(
-      shrinkWrap: true,
-      itemCount: _filteredData.length,
-      itemBuilder: (BuildContext context, int index) {
-        final String result = _filteredData[index];
-        return GestureDetector(
-          onTap: () {
-            _handleResultSelected(result);
-          },
-          child: ListTile(
-            title: Text(result),
-            // Add any other information you want to display for each result
-          ),
-        );
-      },
-    );
+    if (_filteredData.isEmpty) {
+      return Text(
+        'Nenhum resultado encontrado.',
+        style: TextStyle(fontSize: 16.0),
+      );
+    } else {
+      return ListView.builder(
+        shrinkWrap: true,
+        itemCount: _filteredData.length,
+        itemBuilder: (BuildContext context, int index) {
+          final String result = _filteredData[index];
+          return GestureDetector(
+            onTap: () {
+              _handleResultSelected(result);
+            },
+            child: ListTile(
+              title: Text(result),
+              // Add any other information you want to display for each result
+            ),
+          );
+        },
+      );
+    }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
