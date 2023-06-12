@@ -373,7 +373,10 @@ Future<void> _fetchImages() async {
             _handleResultSelected(result);
           },
           child: ListTile(
-            title: Text(result),
+            title: Text(result, style: TextStyle(
+                fontSize: 16.0,
+                decoration: TextDecoration.underline,
+              ),),
             leading: _characterImageMap[result] != null
     ? Image.network(
         _characterImageMap[result]!, // Use the mapped image URL
