@@ -14,18 +14,36 @@ class DataService {
 
   var chaves = ["name", "style", "ibu"];
   var colunas = ["Nome", "Estilo", "IBU"];
-  var quantidadeItens = 100;
+  var quantidadeItens = 1000;
 
   void columnCharacters() {
     currentIndex = 0;
-    chaves = ["name", "origin", "publisher", "image"];
-    colunas = ["Nome", "Origem", "Editora", "perfil"];
+    chaves = [
+      "name",
+      "origin",
+      "publisher",
+      "image",
+      "real_name",
+      "count_of_issue_appearances",
+      "deck",
+      "ID"
+    ];
+    colunas = [
+      "Nome",
+      "Origem",
+      "Editora",
+      "perfil",
+      "Identidade",
+      "contagem",
+      "resumo",
+      "id"
+    ];
   }
 
-  void columnTeams() {
+  void columnIssues() {
     currentIndex = 1;
-    chaves = ["name", "first_appeared_in_issue", "publisher", "image"];
-    colunas = ["Nome", "Primeira aparição", "Editora", "logo"];
+    chaves = ["name", "volume", "deck", "issue_number", "image"];
+    colunas = ["Nome", "vol", "about", "numero", "image"];
   }
 
   void columnPublishers() {
@@ -38,7 +56,7 @@ class DataService {
     if (isLoading[index]) return;
     final funcoes = [
       carregarCharacters,
-      carregarTeams,
+      carregarIssues,
       carregarPublishers,
     ];
     tableStateNotifier.value = {
@@ -75,12 +93,20 @@ class DataService {
             : '';
         final image =
             character['image'] != null ? character['image']['icon_url'] : '';
+        final realName = character['real_name'] ?? '';
+        final ID = character['id'] ?? '';
+        final contagem = character['count_of_issue_appearances'] ?? '';
+        final resumo = character['deck'] ?? '';
 
         return {
           'name': name,
           'origin': origin,
           'publisher': publisher,
           'image': image,
+          'real_name': realName,
+          'id': ID,
+          'count_of_issue_appearances': contagem,
+          'deck': resumo,
         };
       }).toList();
 
@@ -93,13 +119,13 @@ class DataService {
     });
   }
 
-  void carregarTeams() {
-    columnTeams();
+  void carregarIssues() {
+    columnIssues();
     isLoading[1] = true;
-    var teamsUri = Uri(
+    var issuesUri = Uri(
       scheme: 'https',
       host: 'comicvine.gamespot.com',
-      path: 'api/teams',
+      path: 'api/issues',
       queryParameters: {
         'limit': quantidadeItens.toString(),
         'api_key': '75504a0c3fdb9bb78d69b682d9e39fa478d71195',
@@ -107,29 +133,28 @@ class DataService {
       },
     );
 
-    http.read(teamsUri).then((jsonString) {
-      var teamsJson = jsonDecode(jsonString)['results'];
+    http.read(issuesUri).then((jsonString) {
+      var issuesJson = jsonDecode(jsonString)['results'];
 
-      var extractedTeamsJson = teamsJson.map((team) {
-        final name = team['name'] ?? '';
-        final firstAppearedInIssue = team['first_appeared_in_issue'] != null
-            ? team['first_appeared_in_issue']['name']
-            : '';
-        final publisher =
-            team['publisher'] != null ? team['publisher']['name'] : '';
-        final image = team['image'] != null ? team['image']['icon_url'] : '';
+      var extractedIssuesJson = issuesJson.map((issue) {
+        final name = issue['name'] ?? '';
+        final vol = issue['volume'] != null ? issue['volume']['name'] : '';
+        final numero = issue['issue_number'] ?? '';
+        final image = issue['image'] != null ? issue['image']['icon_url'] : '';
+        final about = issue['deck'] ?? '';
 
         return {
           'name': name,
-          'first_appeared_in_issue': firstAppearedInIssue,
-          'publisher': publisher,
+          'volume': vol,
+          'deck': about,
+          'issue_number': numero,
           'image': image,
         };
       }).toList();
 
       tableStateNotifier.value = {
         'status': TableStatus.ready,
-        'dataObjects': extractedTeamsJson,
+        'dataObjects': extractedIssuesJson,
         'propertyNames': [
           "name",
           "first_appeared_in_issue",
@@ -183,8 +208,59 @@ class DataService {
   }
 
   void carregarMoreItems() {
-    quantidadeItens += 100;
+    quantidadeItens >= 1000;
     carregar(currentIndex); // Utiliza o índice da aba atual
+  }
+
+  // Função para exibir a tela de informações do personagem
+
+  void showCharacterInfoDialog(
+      BuildContext context, Map<String, dynamic> character) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Name: ${character['name'] ?? ''}'),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  child: Image.network(
+                    character['image'] ?? '',
+                    width: 125, // Defina a largura desejada da imagem
+                    height: 125, // Defina a altura desejada da imagem
+                    fit: BoxFit.contain, // Para manter a proporção da imagem
+                  ),
+                ),
+                SizedBox(height: 8.0),
+                Text('Identity: ${character['real_name'] ?? ''}'),
+                SizedBox(height: 8.0),
+                Text('Race: ${character['origin'] ?? ''}'),
+                SizedBox(height: 8.0),
+                Text('publisher: ${character['publisher'] ?? ''}'),
+                SizedBox(height: 8.0),
+                Text(
+                    'appearances: ${character['count_of_issue_appearances'] ?? ''}'),
+                SizedBox(height: 8.0),
+                Text('ID: ${character['id'] ?? ''}'),
+                SizedBox(height: 8.0),
+                Text('About: ${character['deck'] ?? ''}'),
+                SizedBox(height: 8.0),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }
 
@@ -216,7 +292,7 @@ class _ApisState extends State<Apis> {
       home: Scaffold(
         appBar: AppBar(
           title: const Text(
-            "INK-CHRONICLES",
+            "INK-CHRONICLES 🦸‍♂️",
             style: TextStyle(
               color: Colors.black,
             ),
@@ -275,8 +351,8 @@ class _ApisState extends State<Apis> {
 }
 
 class NewNavBar extends HookWidget {
-  final _itemNames = ['Personagens', 'Times', 'Editoras'];
-  final _itemIcons = [Icons.person, Icons.group, Icons.house];
+  final _itemNames = ['Characters', 'Issues', 'Publishers'];
+  final _itemIcons = [Icons.person, Icons.book, Icons.house];
 
   final Function(int) itemSelectedCallback;
 
@@ -411,44 +487,25 @@ class DataTableWidget extends StatelessWidget {
         final name = jsonObject['name'];
         String additionalInfo = '';
 
-        if (propertyNames.contains('origin')) {
-          final origin = jsonObject['origin'];
-          if (origin != null) {
-            additionalInfo = origin;
-          }
-        } else if (propertyNames.contains('first_appeared_in_issue')) {
-          final firstAppearance = jsonObject['first_appeared_in_issue'];
-          if (firstAppearance != null) {
-            additionalInfo = firstAppearance;
-          }
-        } else if (propertyNames.contains('location_state')) {
-          final locationState = jsonObject['location_state'];
-          final locationCity = jsonObject['location_city'];
-          if (locationState != null && locationCity != null) {
-            additionalInfo = '$locationCity, $locationState';
-          }
-        }
-
         return Container(
           padding: EdgeInsets.symmetric(vertical: 4.0),
-          child: Column(
-            children: [
-              Image.network(
-                imageUrl,
-                width: 100.0,
-              ),
-              SizedBox(height: 4.0),
-              Text(
-                name,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 4.0),
-              Text(
-                additionalInfo,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 12),
-              ),
-            ],
+          child: GestureDetector(
+            onTap: () =>
+                dataService.showCharacterInfoDialog(context, jsonObject),
+            child: Column(
+              children: [
+                Image.network(
+                  imageUrl,
+                  width: 100.0,
+                ),
+                SizedBox(height: 4.0),
+                Text(
+                  name,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 4.0),
+              ],
+            ),
           ),
         );
       }),
