@@ -7,6 +7,7 @@ import 'dart:convert';
 enum TableStatus { idle, loading, ready, error }
 
 class DataService {
+  String nameSearch = '';
   List<bool> isLoading = [false, false, false];
   int currentIndex = 0;
   final ValueNotifier<Map<String, dynamic>> tableStateNotifier =
@@ -14,7 +15,7 @@ class DataService {
 
   var chaves = ["name", "style", "ibu"];
   var colunas = ["Nome", "Estilo", "IBU"];
-  var quantidadeItens = 20;
+  var quantidadeItens = 100;
 
   void columnCharacters() {
     currentIndex = 0;
@@ -92,6 +93,84 @@ class DataService {
       isLoading[0] = false;
     });
   }
+
+  Widget searchCharacters(String? nameSearch) {
+  columnCharacters(); // Define the implementation of this method
+
+  var charactersUri = Uri(
+    scheme: 'https',
+    host: 'comicvine.gamespot.com',
+    path: 'api/characters',
+    queryParameters: {
+      'limit': quantidadeItens.toString(), // Adjust this value accordingly
+      'api_key': '75504a0c3fdb9bb78d69b682d9e39fa478d71195',
+      'format': 'json',
+    },
+  );
+
+  return FutureBuilder<String>(
+    future: http.read(charactersUri),
+    builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return CircularProgressIndicator();
+      } else if (snapshot.hasError) {
+        return Text('Erro ao carregar os dados');
+      } else {
+        var charactersJson = jsonDecode(snapshot.data!)['results'];
+
+        var extractedCharactersJson = charactersJson.map((character) {
+          final name = character['name'] ?? '';
+          final origin =
+              character['origin'] != null ? character['origin']['name'] : '';
+          final publisher = character['publisher'] != null
+              ? character['publisher']['name']
+              : '';
+          final image =
+              character['image'] != null ? character['image']['icon_url'] : '';
+
+          return {
+            'name': name,
+            'origin': origin,
+            'publisher': publisher,
+            'image': image,
+          };
+        }).toList();
+
+        var filteredCharactersJson = extractedCharactersJson
+            .where((character) => character['name'] == (nameSearch ?? ''))
+            .toList();
+
+        if (filteredCharactersJson.isEmpty) {
+          return Text('Nenhum resultado encontrado.');
+        } else {
+          return ListView.builder(
+            shrinkWrap: true,
+            itemCount: filteredCharactersJson.length,
+            itemBuilder: (BuildContext context, int index) {
+              final character = filteredCharactersJson[index];
+              return ListTile(
+                title: Text(character['name']),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Origin: ${character['origin']}'),
+                    Text('Publisher: ${character['publisher']}'),
+                  ],
+                ),
+                leading: Image.network(character['image']),
+              );
+            },
+          );
+        }
+      }
+    },
+  );
+}
+
+
+
+
+
 
   void carregarTeams() {
     columnTeams();
@@ -183,7 +262,7 @@ class DataService {
   }
 
   void carregarMoreItems() {
-    quantidadeItens += 22;
+    quantidadeItens += 100;
     carregar(currentIndex); // Utiliza o índice da aba atual
   }
 }
