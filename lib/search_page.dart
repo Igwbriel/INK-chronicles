@@ -25,10 +25,43 @@ class SearchBarApp extends StatelessWidget {
 
 class ResultDetailPage extends StatelessWidget {
   final String result;
+  var chaves = ["name", "style", "ibu"];
+  var colunas = ["Nome", "Estilo", "IBU"];
 
   ResultDetailPage({required this.result});
+  
 
   Widget searchCharacters(String? nameSearch) {
+    final ValueNotifier<Map<String, dynamic>> tableStateNotifier =
+      ValueNotifier({'status': TableStatus.idle, 'dataObjects': []});
+    tableStateNotifier.value = {
+      'status': TableStatus.loading,
+      'dataObjects': [],
+      'columnNames': [],
+    };
+    void columnCharacters() {
+
+    chaves = [
+      "name",
+      "origin",
+      "publisher",
+      "image",
+      "real_name",
+      "count_of_issue_appearances",
+      "deck",
+      "ID"
+    ];
+    colunas = [
+      "Nome",
+      "Origem",
+      "Editora",
+      "perfil",
+      "Identidade",
+      "contagem",
+      "resumo",
+      "id"
+    ];
+  }
     var charactersUri = Uri(
       scheme: 'https',
       host: 'comicvine.gamespot.com',
@@ -44,30 +77,42 @@ class ResultDetailPage extends StatelessWidget {
       future: http.read(charactersUri),
       builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
+          return Center(child:CircularProgressIndicator(),);
         } else if (snapshot.hasError) {
           return Text('Erro ao carregar os dados');
         } else {
           var charactersJson = jsonDecode(snapshot.data!)['results'];
 
           var extractedCharactersJson = charactersJson.map((character) {
-            final name = character['name'] ?? '';
-            final origin =
-                character['origin'] != null ? character['origin']['name'] : '';
-            final publisher = character['publisher'] != null
-                ? character['publisher']['name']
-                : '';
-            final image = character['image'] != null
-                ? character['image']['icon_url']
-                : '';
+        final name = character['name'] ?? '';
+        final origin =
+            character['origin'] != null ? character['origin']['name'] : '';
+        final publisher = character['publisher'] != null
+            ? character['publisher']['name']
+            : '';
+        final image =
+            character['image'] != null ? character['image']['icon_url'] : '';
+        final realName = character['real_name'] ?? '';
+        final ID = character['id'] ?? '';
+        final contagem = character['count_of_issue_appearances'] ?? '';
+        final resumo = character['deck'] ?? '';
 
-            return {
-              'name': name,
-              'origin': origin,
-              'publisher': publisher,
-              'image': image,
-            };
-          }).toList();
+          return {
+          'name': name,
+          'origin': origin,
+          'publisher': publisher,
+          'image': image,
+          'real_name': realName,
+          'id': ID,
+          'count_of_issue_appearances': contagem,
+          'deck': resumo,
+        };
+      }).toList();
+      tableStateNotifier.value = {
+        'status': TableStatus.ready,
+        'dataObjects': extractedCharactersJson,
+        'propertyNames': ["name", "origin", "publisher", "image"],
+      };
 
           var filteredCharactersJson = extractedCharactersJson
               .where((character) => character['name'] == (result))
@@ -88,6 +133,9 @@ class ResultDetailPage extends StatelessWidget {
                     children: [
                       Text('Origin: ${character['origin']}'),
                       Text('Publisher: ${character['publisher']}'),
+                      Text('Real Name: ${character['real_name']}'),
+                      Text('Numero de aparições : ${character['count_of_issue_appearances']}'),
+                      Text('Resumo : ${character['deck']}'),
                     ],
                   ),
                   leading: Image.network(character['image']),
@@ -138,7 +186,7 @@ class _SearchScreenState extends State<SearchScreen> {
         builder: (context) => ResultDetailPage(result: result),
       ),
     );
-  }
+  }  
 
   void _populateData() async {
     try {
@@ -203,6 +251,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   void _handleSearchSubmitted(String value) {
     _filterSearchResults(value);
+
   }
 
   Widget _buildCarousel() {
@@ -298,30 +347,31 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildSearchResults() {
-    if (_filteredData.isEmpty) {
-      return Text(
-        'Nenhum resultado encontrado.',
-        style: TextStyle(fontSize: 16.0),
-      );
-    } else {
-      return ListView.builder(
-        shrinkWrap: true,
-        itemCount: _filteredData.length,
-        itemBuilder: (BuildContext context, int index) {
-          final String result = _filteredData[index];
-          return GestureDetector(
-            onTap: () {
-              _handleResultSelected(result);
-            },
-            child: ListTile(
-              title: Text(result),
-              // Add any other information you want to display for each result
-            ),
-          );
-        },
-      );
-    }
+  if (_filteredData.isEmpty) {
+    return Text(
+      'Nenhum resultado encontrado.',
+      style: TextStyle(fontSize: 16.0),
+    );
+  } else {
+    return ListView.builder(
+      shrinkWrap: true,
+      itemCount: _filteredData.length,
+      itemBuilder: (BuildContext context, int index) {
+        final String result = _filteredData[index];
+        return GestureDetector(
+          onTap: () {
+            _handleResultSelected(result);
+          },
+          child: ListTile(
+            title: Text(result),
+            // Add any other information you want to display for each result
+          ),
+        );
+      },
+    );
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
