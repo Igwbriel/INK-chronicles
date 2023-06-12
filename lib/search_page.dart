@@ -29,39 +29,38 @@ class ResultDetailPage extends StatelessWidget {
   var colunas = ["Nome", "Estilo", "IBU"];
 
   ResultDetailPage({required this.result});
-  
 
   Widget searchCharacters(String? nameSearch) {
     final ValueNotifier<Map<String, dynamic>> tableStateNotifier =
-      ValueNotifier({'status': TableStatus.idle, 'dataObjects': []});
+        ValueNotifier({'status': TableStatus.idle, 'dataObjects': []});
     tableStateNotifier.value = {
       'status': TableStatus.loading,
       'dataObjects': [],
       'columnNames': [],
     };
     void columnCharacters() {
+      chaves = [
+        "name",
+        "origin",
+        "publisher",
+        "image",
+        "real_name",
+        "count_of_issue_appearances",
+        "deck",
+        "ID"
+      ];
+      colunas = [
+        "Nome",
+        "Origem",
+        "Editora",
+        "perfil",
+        "Identidade",
+        "contagem",
+        "resumo",
+        "id"
+      ];
+    }
 
-    chaves = [
-      "name",
-      "origin",
-      "publisher",
-      "image",
-      "real_name",
-      "count_of_issue_appearances",
-      "deck",
-      "ID"
-    ];
-    colunas = [
-      "Nome",
-      "Origem",
-      "Editora",
-      "perfil",
-      "Identidade",
-      "contagem",
-      "resumo",
-      "id"
-    ];
-  }
     var charactersUri = Uri(
       scheme: 'https',
       host: 'comicvine.gamespot.com',
@@ -77,42 +76,45 @@ class ResultDetailPage extends StatelessWidget {
       future: http.read(charactersUri),
       builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child:CircularProgressIndicator(),);
+          return Center(
+            child: CircularProgressIndicator(),
+          );
         } else if (snapshot.hasError) {
           return Text('Erro ao carregar os dados');
         } else {
           var charactersJson = jsonDecode(snapshot.data!)['results'];
 
           var extractedCharactersJson = charactersJson.map((character) {
-        final name = character['name'] ?? '';
-        final origin =
-            character['origin'] != null ? character['origin']['name'] : '';
-        final publisher = character['publisher'] != null
-            ? character['publisher']['name']
-            : '';
-        final image =
-            character['image'] != null ? character['image']['icon_url'] : '';
-        final realName = character['real_name'] ?? '';
-        final ID = character['id'] ?? '';
-        final contagem = character['count_of_issue_appearances'] ?? '';
-        final resumo = character['deck'] ?? '';
+            final name = character['name'] ?? '';
+            final origin =
+                character['origin'] != null ? character['origin']['name'] : '';
+            final publisher = character['publisher'] != null
+                ? character['publisher']['name']
+                : '';
+            final image = character['image'] != null
+                ? character['image']['icon_url']
+                : '';
+            final realName = character['real_name'] ?? '';
+            final ID = character['id'] ?? '';
+            final contagem = character['count_of_issue_appearances'] ?? '';
+            final resumo = character['deck'] ?? '';
 
-          return {
-          'name': name,
-          'origin': origin,
-          'publisher': publisher,
-          'image': image,
-          'real_name': realName,
-          'id': ID,
-          'count_of_issue_appearances': contagem,
-          'deck': resumo,
-        };
-      }).toList();
-      tableStateNotifier.value = {
-        'status': TableStatus.ready,
-        'dataObjects': extractedCharactersJson,
-        'propertyNames': ["name", "origin", "publisher", "image"],
-      };
+            return {
+              'name': name,
+              'origin': origin,
+              'publisher': publisher,
+              'image': image,
+              'real_name': realName,
+              'id': ID,
+              'count_of_issue_appearances': contagem,
+              'deck': resumo,
+            };
+          }).toList();
+          tableStateNotifier.value = {
+            'status': TableStatus.ready,
+            'dataObjects': extractedCharactersJson,
+            'propertyNames': ["name", "origin", "publisher", "image"],
+          };
 
           var filteredCharactersJson = extractedCharactersJson
               .where((character) => character['name'] == (result))
@@ -134,7 +136,8 @@ class ResultDetailPage extends StatelessWidget {
                       Text('Origin: ${character['origin']}'),
                       Text('Publisher: ${character['publisher']}'),
                       Text('Real Name: ${character['real_name']}'),
-                      Text('Numero de aparições : ${character['count_of_issue_appearances']}'),
+                      Text(
+                          'Numero de aparições : ${character['count_of_issue_appearances']}'),
                       Text('Resumo : ${character['deck']}'),
                     ],
                   ),
@@ -186,7 +189,7 @@ class _SearchScreenState extends State<SearchScreen> {
         builder: (context) => ResultDetailPage(result: result),
       ),
     );
-  }  
+  }
 
   void _populateData() async {
     try {
@@ -211,7 +214,7 @@ class _SearchScreenState extends State<SearchScreen> {
   Future<void> _fetchImages() async {
     try {
       final response = await http.get(Uri.parse(
-          'https://comicvine.gamespot.com/api/volumes/?api_key=75504a0c3fdb9bb78d69b682d9e39fa478d71195&format=json'));
+          'https://comicvine.gamespot.com/api/characters/?api_key=75504a0c3fdb9bb78d69b682d9e39fa478d71195&format=json'));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
@@ -251,43 +254,46 @@ class _SearchScreenState extends State<SearchScreen> {
 
   void _handleSearchSubmitted(String value) {
     _filterSearchResults(value);
-
   }
 
   Widget _buildCarousel() {
-    return SizedBox(
-      width: 200,
-      height: 200,
-      child: Transform.scale(
-        scale: 2.0,
-        child: CarouselSlider(
-          options: CarouselOptions(
-            autoPlay: true,
-            aspectRatio: 16 / 9,
-            autoPlayCurve: Curves.fastOutSlowIn,
-            autoPlayInterval: const Duration(seconds: 5),
-            autoPlayAnimationDuration: const Duration(milliseconds: 800),
-            enableInfiniteScroll: true,
-            pauseAutoPlayOnTouch: true,
-            scrollDirection: Axis.horizontal,
+    if (_imageUrls.isEmpty) {
+      return CircularProgressIndicator();
+    } else {
+      return SizedBox(
+        width: 200,
+        height: 200,
+        child: Transform.scale(
+          scale: 2.0,
+          child: CarouselSlider(
+            options: CarouselOptions(
+              autoPlay: true,
+              aspectRatio: 16 / 9,
+              autoPlayCurve: Curves.fastOutSlowIn,
+              autoPlayInterval: const Duration(seconds: 5),
+              autoPlayAnimationDuration: const Duration(milliseconds: 800),
+              enableInfiniteScroll: true,
+              pauseAutoPlayOnTouch: true,
+              scrollDirection: Axis.horizontal,
+            ),
+            items: _imageUrls.map((imageUrl) {
+              return Builder(
+                builder: (BuildContext context) {
+                  return Container(
+                    width: MediaQuery.of(context).size.width,
+                    margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                    child: Image.network(
+                      imageUrl,
+                      fit: BoxFit.none,
+                    ),
+                  );
+                },
+              );
+            }).toList(),
           ),
-          items: _imageUrls.map((imageUrl) {
-            return Builder(
-              builder: (BuildContext context) {
-                return Container(
-                  width: MediaQuery.of(context).size.width,
-                  margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                  child: Image.network(
-                    imageUrl,
-                    fit: BoxFit.none,
-                  ),
-                );
-              },
-            );
-          }).toList(),
         ),
-      ),
-    );
+      );
+    }
   }
 
   Widget _buildLogo() {
@@ -347,31 +353,32 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildSearchResults() {
-  if (_filteredData.isEmpty) {
-    return Text(
-      'Nenhum resultado encontrado.',
-      style: TextStyle(fontSize: 16.0),
-    );
-  } else {
-    return ListView.builder(
-      shrinkWrap: true,
-      itemCount: _filteredData.length,
-      itemBuilder: (BuildContext context, int index) {
-        final String result = _filteredData[index];
-        return GestureDetector(
-          onTap: () {
-            _handleResultSelected(result);
-          },
-          child: ListTile(
-            title: Text(result),
-            // Add any other information you want to display for each result
-          ),
-        );
-      },
-    );
+    if (_filteredData.isEmpty) {
+      return CircularProgressIndicator();
+    } else {
+      return ListView.builder(
+        shrinkWrap: true,
+        itemCount: _filteredData.length,
+        itemBuilder: (BuildContext context, int index) {
+          final String result = _filteredData[index];
+          return GestureDetector(
+            onTap: () {
+              _handleResultSelected(result);
+            },
+            child: ListTile(
+              title: Text(result),
+              leading: Image.network(
+                _imageUrls[
+                    index], // Assuming _imageUrls is populated with image URLs in the same order as _filteredData
+                width: 50,
+                height: 50,
+              ),
+            ),
+          );
+        },
+      );
+    }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
