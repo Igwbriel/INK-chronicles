@@ -10,9 +10,9 @@ class MyApp extends StatelessWidget {
     
     return MaterialApp(initialRoute: '/'
     , routes: {
-      '/': (context) => Homepage(),
-      'Initial': (context) => Apis(),
-      'Search': (context)=> SearchBarApp(),
+      '/': (context) => const Homepage(),
+      'Initial': (context) => const Apis(),
+      'Search': (context)=> const SearchBarApp(),
     });
   }
 }

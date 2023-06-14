@@ -11,7 +11,7 @@ class Homepage extends StatelessWidget {
       theme: ThemeData(primarySwatch: black),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: Color.fromARGB(255, 46, 46, 46),
+        backgroundColor: const Color.fromARGB(255, 46, 46, 46),
         body: Stack(
           children: <Widget>[
             Positioned.fill(
@@ -30,7 +30,7 @@ class Homepage extends StatelessWidget {
                       width: size.width * 0.8,
                       child: Column(
                         children: [
-                          TextField(
+                          const TextField(
                             decoration: InputDecoration(
                               filled: true,
                               fillColor: Colors
@@ -38,8 +38,8 @@ class Homepage extends StatelessWidget {
                               hintText: 'Login',
                             ),
                           ),
-                          SizedBox(height: 10),
-                          TextField(
+                          const SizedBox(height: 10),
+                          const TextField(
                             decoration: InputDecoration(
                               filled: true,
                               fillColor: Colors
@@ -49,26 +49,25 @@ class Homepage extends StatelessWidget {
                             obscureText:
                                 true, // Oculta o texto digitado (senha)
                           ),
-                          SizedBox(height: 10),
+                          const SizedBox(height: 10),
                           ElevatedButton(
                             onPressed: () {
                               Navigator.pushNamed(context, 'Search');
                             },
-                            child: Text(
-                              'Entrar',
-                              style: TextStyle(fontSize: 50),
-                            ),
                             style: ElevatedButton.styleFrom(
-                              primary:
-                                  Colors.black, // Cor de fundo transparente
-                              padding: EdgeInsets.symmetric(
+                              backgroundColor: Colors.black, // Cor de fundo transparente
+                              padding: const EdgeInsets.symmetric(
                                   vertical: 20, horizontal: 40),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(
                                     18.0), // Borda arredondada
-                                side: BorderSide(
+                                side: const BorderSide(
                                     color: Colors.black), // Cor da borda
                               ),
+                            ),
+                            child: const Text(
+                              'Entrar',
+                              style: TextStyle(fontSize: 50),
                             ),
                           ),
                         ],

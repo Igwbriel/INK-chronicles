@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable, non_constant_identifier_names, library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -225,34 +227,32 @@ class DataService {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  child: Image.network(
-                    character['image'] ?? '',
-                    width: 125, // Defina a largura desejada da imagem
-                    height: 125, // Defina a altura desejada da imagem
-                    fit: BoxFit.contain, // Para manter a proporção da imagem
-                  ),
+                Image.network(
+                  character['image'] ?? '',
+                  width: 125, // Defina a largura desejada da imagem
+                  height: 125, // Defina a altura desejada da imagem
+                  fit: BoxFit.contain, // Para manter a proporção da imagem
                 ),
-                SizedBox(height: 8.0),
+                const SizedBox(height: 8.0),
                 Text('Identity: ${character['real_name'] ?? ''}'),
-                SizedBox(height: 8.0),
+                const SizedBox(height: 8.0),
                 Text('Race: ${character['origin'] ?? ''}'),
-                SizedBox(height: 8.0),
+                const SizedBox(height: 8.0),
                 Text('publisher: ${character['publisher'] ?? ''}'),
-                SizedBox(height: 8.0),
+                const SizedBox(height: 8.0),
                 Text(
                     'appearances: ${character['count_of_issue_appearances'] ?? ''}'),
-                SizedBox(height: 8.0),
+                const SizedBox(height: 8.0),
                 Text('ID: ${character['id'] ?? ''}'),
-                SizedBox(height: 8.0),
+                const SizedBox(height: 8.0),
                 Text('About: ${character['deck'] ?? ''}'),
-                SizedBox(height: 8.0),
+                const SizedBox(height: 8.0),
               ],
             ),
           ),
           actions: [
             TextButton(
-              child: Text('Close'),
+              child: const Text('Close'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -267,8 +267,12 @@ class DataService {
 final dataService = DataService();
 
 class Apis extends StatefulWidget {
+  const Apis({super.key});
+
   @override
-  _ApisState createState() => _ApisState();
+  _ApisState createState() {
+    return _ApisState();
+  }
 }
 
 class _ApisState extends State<Apis> {
@@ -312,7 +316,7 @@ class _ApisState extends State<Apis> {
                         'assets/images/inkLogo.png',
                         width: 200.0,
                       ),
-                      SizedBox(height: 16.0),
+                      const SizedBox(height: 16.0),
                     ],
                   ),
                 );
@@ -332,9 +336,9 @@ class _ApisState extends State<Apis> {
                   currentIndex: currentIndex, // Passa o índice da aba atual
                 );
               case TableStatus.error:
-                return Text("Lascou");
+                return const Text("Lascou");
             }
-            return Text("...");
+            return const Text("...");
           },
         ),
         bottomNavigationBar: NewNavBar(
@@ -356,7 +360,7 @@ class NewNavBar extends HookWidget {
 
   final Function(int) itemSelectedCallback;
 
-  NewNavBar({required this.itemSelectedCallback});
+  NewNavBar({super.key, required this.itemSelectedCallback});
 
   @override
   Widget build(BuildContext context) {
@@ -386,7 +390,7 @@ class InfiniteScrollWidget extends StatefulWidget {
   final VoidCallback loadMoreItems;
   int currentIndex = 0;
 
-  InfiniteScrollWidget({
+  InfiniteScrollWidget({super.key, 
     required this.dataObjects,
     required this.propertyNames,
     required this.columnNames,
@@ -399,7 +403,7 @@ class InfiniteScrollWidget extends StatefulWidget {
 }
 
 class _InfiniteScrollWidgetState extends State<InfiniteScrollWidget> {
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
   bool _isLoading = false;
   int currentIndex = 0;
 
@@ -436,7 +440,7 @@ class _InfiniteScrollWidgetState extends State<InfiniteScrollWidget> {
     return SingleChildScrollView(
       controller: _scrollController,
       child: Container(
-        padding: EdgeInsets.only(
+        padding: const EdgeInsets.only(
           bottom: 60,
         ),
         child: Column(
@@ -447,7 +451,7 @@ class _InfiniteScrollWidgetState extends State<InfiniteScrollWidget> {
               columnNames: widget.columnNames,
             ),
             _isLoading
-                ? Padding(
+                ? const Padding(
                     padding: EdgeInsets.all(16),
                     child: CircularProgressIndicator(),
                   )
@@ -464,7 +468,7 @@ class DataTableWidget extends StatelessWidget {
   final List<String> propertyNames;
   final List<String> columnNames;
 
-  DataTableWidget({
+  const DataTableWidget({super.key, 
     required this.jsonObjects,
     required this.propertyNames,
     required this.columnNames,
@@ -479,16 +483,15 @@ class DataTableWidget extends StatelessWidget {
     return GridView.count(
       crossAxisCount: crossAxisCount,
       childAspectRatio: childAspectRatio,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       children: List.generate(jsonObjects.length, (index) {
         final jsonObject = jsonObjects[index];
         final imageUrl = jsonObject['image'];
         final name = jsonObject['name'];
-        String additionalInfo = '';
 
         return Container(
-          padding: EdgeInsets.symmetric(vertical: 4.0),
+          padding: const EdgeInsets.symmetric(vertical: 4.0),
           child: GestureDetector(
             onTap: () =>
                 dataService.showCharacterInfoDialog(context, jsonObject),
@@ -498,12 +501,12 @@ class DataTableWidget extends StatelessWidget {
                   imageUrl,
                   width: 100.0,
                 ),
-                SizedBox(height: 4.0),
+                const SizedBox(height: 4.0),
                 Text(
                   name,
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 4.0),
+                const SizedBox(height: 4.0),
               ],
             ),
           ),
@@ -519,5 +522,5 @@ void main() {
     DeviceOrientation.portraitDown,
   ]);
 
-  runApp(Apis());
+  runApp(const Apis());
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-final MaterialColor black = const MaterialColor(
+const MaterialColor black = MaterialColor(
     0xFF000000,
     <int, Color>{
       50: Color(0xFFE5E5E5),

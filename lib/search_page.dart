@@ -1,3 +1,5 @@
+// ignore_for_file: unused_element, non_constant_identifier_names, library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:carousel_slider/carousel_slider.dart';
@@ -8,27 +10,36 @@ import 'dart:convert';
 var data = DataService();
 
 class SearchBarApp extends StatelessWidget {
+  const SearchBarApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       routes: {
-        'Initial': (context) => Apis(),
+        'Initial': (context) => const Apis(),
       },
       title: 'Search Bar',
       theme: ThemeData(
         primarySwatch: black,
       ),
-      home: SearchScreen(),
+      home: const SearchScreen(),
     );
   }
 }
 
-class ResultDetailPage extends StatelessWidget {
+class ResultDetailPage extends StatefulWidget {
   final String result;
-  var chaves = ["name", "style", "ibu"];
-  var colunas = ["Nome", "Estilo", "IBU"];
 
-  ResultDetailPage({required this.result});
+  const ResultDetailPage({super.key, required this.result});
+
+  @override
+  State<ResultDetailPage> createState() => _ResultDetailPageState();
+}
+
+class _ResultDetailPageState extends State<ResultDetailPage> {
+  var chaves = ["name", "style", "ibu"];
+
+  var colunas = ["Nome", "Estilo", "IBU"];
 
   Widget searchCharacters(String? nameSearch) {
     final ValueNotifier<Map<String, dynamic>> tableStateNotifier =
@@ -38,7 +49,7 @@ class ResultDetailPage extends StatelessWidget {
       'dataObjects': [],
       'columnNames': [],
     };
-    void columnCharacters() {
+    Future<void> columnCharacters() async {
       chaves = [
         "name",
         "origin",
@@ -76,11 +87,11 @@ class ResultDetailPage extends StatelessWidget {
       future: http.read(charactersUri),
       builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
+          return const Center(
             child: CircularProgressIndicator(),
           );
         } else if (snapshot.hasError) {
-          return Text('Erro ao carregar os dados');
+          return const Text('Erro ao carregar os dados');
         } else {
           var charactersJson = jsonDecode(snapshot.data!)['results'];
 
@@ -117,11 +128,11 @@ class ResultDetailPage extends StatelessWidget {
           };
 
           var filteredCharactersJson = extractedCharactersJson
-              .where((character) => character['name'] == (result))
+              .where((character) => character['name'] == (widget.result))
               .toList();
 
           if (filteredCharactersJson.isEmpty) {
-            return Text('Nenhum resultado encontrado.');
+            return const Text('Nenhum resultado encontrado.');
           } else {
             return ListView.builder(
               shrinkWrap: true,
@@ -155,24 +166,27 @@ class ResultDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Detalhes do Resultado'),
+        title: const Text('Detalhes do Resultado'),
       ),
-      body: searchCharacters(result),
+      body: searchCharacters(widget.result),
     );
   }
 }
 
 class SearchScreen extends StatefulWidget {
+  const SearchScreen({super.key});
+
   @override
-  _SearchScreenState createState() => _SearchScreenState();
+  _SearchScreenState createState() {
+    return _SearchScreenState();
+  }
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  String _searchText = "";
   List<String> _data = [];
   List<String> _filteredData = [];
   List<String> _imageUrls = [];
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -204,14 +218,13 @@ class _SearchScreenState extends State<SearchScreen> {
           _filteredData = _data;
         });
       } else {
-        print('Failed to fetch data: ${response.statusCode}');
       }
+    // ignore: empty_catches
     } catch (e) {
-      print('Failed to fetch data: $e');
     }
   }
 
-  Map<String, String?> _characterImageMap = {};
+  final Map<String, String?> _characterImageMap = {};
 
 
 Future<void> _fetchImages() async {
@@ -237,10 +250,9 @@ Future<void> _fetchImages() async {
         _imageUrls = imageUrls;
       });
     } else {
-      print('Failed to fetch images: ${response.statusCode}');
     }
+  // ignore: empty_catches
   } catch (e) {
-    print('Failed to fetch images: $e');
   }
 }
 
@@ -254,7 +266,6 @@ Future<void> _fetchImages() async {
     }
 
     setState(() {
-      _searchText = query;
       _filteredData = filteredList;
     });
   }
@@ -265,7 +276,7 @@ Future<void> _fetchImages() async {
 
   Widget _buildCarousel() {
     if (_imageUrls.isEmpty) {
-      return CircularProgressIndicator();
+      return const CircularProgressIndicator();
     } else {
       return SizedBox(
         width: 200,
@@ -361,7 +372,7 @@ Future<void> _fetchImages() async {
 
   Widget _buildSearchResults() {
   if (_filteredData.isEmpty) {
-    return CircularProgressIndicator();
+    return const CircularProgressIndicator();
   } else {
     return ListView.builder(
       shrinkWrap: true,
@@ -373,7 +384,7 @@ Future<void> _fetchImages() async {
             _handleResultSelected(result);
           },
           child: ListTile(
-            title: Text(result, style: TextStyle(
+            title: Text(result, style: const TextStyle(
                 fontSize: 16.0,
                 decoration: TextDecoration.underline,
               ),),
@@ -383,7 +394,7 @@ Future<void> _fetchImages() async {
         width: 50,
         height: 50,
       )
-    : SizedBox(), // Placeholder widget if the image URL is null
+    : const SizedBox(), // Placeholder widget if the image URL is null
 
           ),
         );
