@@ -449,6 +449,7 @@ class _InfiniteScrollWidgetState extends State<InfiniteScrollWidget> {
               jsonObjects: widget.dataObjects,
               propertyNames: widget.propertyNames,
               columnNames: widget.columnNames,
+              currentIndex: currentIndex,
             ),
             _isLoading
                 ? const Padding(
@@ -463,16 +464,20 @@ class _InfiniteScrollWidgetState extends State<InfiniteScrollWidget> {
   }
 }
 
+
 class DataTableWidget extends StatelessWidget {
   final List<dynamic> jsonObjects;
   final List<String> propertyNames;
   final List<String> columnNames;
+  final int currentIndex;
 
-  const DataTableWidget({super.key, 
+  const DataTableWidget({
+    Key? key,
     required this.jsonObjects,
     required this.propertyNames,
     required this.columnNames,
-  });
+    required this.currentIndex,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -493,8 +498,11 @@ class DataTableWidget extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.symmetric(vertical: 4.0),
           child: GestureDetector(
-            onTap: () =>
-                dataService.showCharacterInfoDialog(context, jsonObject),
+            onTap: () {
+              if (currentIndex == 0) {
+                dataService.showCharacterInfoDialog(context, jsonObject);
+              }
+            },
             child: Column(
               children: [
                 Image.network(
@@ -515,6 +523,7 @@ class DataTableWidget extends StatelessWidget {
     );
   }
 }
+
 
 void main() {
   SystemChrome.setPreferredOrientations([
