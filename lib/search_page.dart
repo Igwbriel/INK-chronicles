@@ -9,6 +9,8 @@ import 'dart:convert';
 
 var data = DataService();
 
+
+
 class SearchBarApp extends StatelessWidget {
   const SearchBarApp({super.key});
 
@@ -16,7 +18,7 @@ class SearchBarApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       routes: {
-        'Initial': (context) => const Apis(),
+        'Initial': (context) =>  const Apis(),
       },
       title: 'Search Bar',
       theme: ThemeData(
@@ -166,7 +168,7 @@ class _ResultDetailPageState extends State<ResultDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Detalhes do Resultado'),
+        title: const Text('Results Details'),
       ),
       body: searchCharacters(widget.result),
     );
@@ -332,7 +334,7 @@ Future<void> _fetchImages() async {
         controller: _searchController,
         onSubmitted: _handleSearchSubmitted,
         decoration: const InputDecoration(
-          labelText: 'Search',
+          labelText: 'Search a character name',
           prefixIcon: Icon(Icons.search),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(25.0)),
@@ -358,7 +360,7 @@ Future<void> _fetchImages() async {
               Navigator.pushNamed(context, 'Initial');
             },
             child: const Text(
-              'Todos',
+              'All',
               style: TextStyle(
                 fontSize: 16.0,
                 decoration: TextDecoration.underline,

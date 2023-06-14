@@ -44,7 +44,7 @@ class Homepage extends StatelessWidget {
                               filled: true,
                               fillColor: Colors
                                   .white70, // Cor de fundo do campo de senha
-                              hintText: 'Senha',
+                              hintText: 'Password',
                             ),
                             obscureText:
                                 true, // Oculta o texto digitado (senha)
@@ -66,7 +66,7 @@ class Homepage extends StatelessWidget {
                               ),
                             ),
                             child: const Text(
-                              'Entrar',
+                              'Enter',
                               style: TextStyle(fontSize: 50),
                             ),
                           ),
