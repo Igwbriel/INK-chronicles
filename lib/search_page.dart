@@ -9,8 +9,6 @@ import 'dart:convert';
 
 var data = DataService();
 
-
-
 class SearchBarApp extends StatelessWidget {
   const SearchBarApp({super.key});
 
@@ -18,7 +16,7 @@ class SearchBarApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       routes: {
-        'Initial': (context) =>  const Apis(),
+        'Initial': (context) => const Apis(),
       },
       title: 'Search Bar',
       theme: ThemeData(
@@ -219,45 +217,40 @@ class _SearchScreenState extends State<SearchScreen> {
           _data = results.map((result) => result['name'] as String).toList();
           _filteredData = _data;
         });
-      } else {
-      }
-    // ignore: empty_catches
-    } catch (e) {
-    }
+      } else {}
+      // ignore: empty_catches
+    } catch (e) {}
   }
 
   final Map<String, String?> _characterImageMap = {};
 
+  Future<void> _fetchImages() async {
+    try {
+      final response = await http.get(Uri.parse(
+          'https://comicvine.gamespot.com/api/characters/?api_key=75504a0c3fdb9bb78d69b682d9e39fa478d71195&format=json'));
 
-Future<void> _fetchImages() async {
-  try {
-    final response = await http.get(Uri.parse(
-        'https://comicvine.gamespot.com/api/characters/?api_key=75504a0c3fdb9bb78d69b682d9e39fa478d71195&format=json'));
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> responseData = json.decode(response.body);
+        final List<dynamic> data = responseData['results'];
+        final List<String> imageUrls = [];
 
-      final List<dynamic> data = responseData['results'];
-      final List<String> imageUrls = [];
-
-      for (final item in data) {
-        final String characterName = item['name'];
-        final String imageUrl = item['image']['icon_url'];
-        imageUrls.add(imageUrl);
-        _characterImageMap[characterName] = imageUrl; // Map character name to image URL
+        for (final item in data) {
+          final String characterName = item['name'];
+          final String imageUrl = item['image']['icon_url'];
+          imageUrls.add(imageUrl);
+          _characterImageMap[characterName] =
+              imageUrl; // Map character name to image URL
 // Map character name to image URL
-      }
+        }
 
-      setState(() {
-        _imageUrls = imageUrls;
-      });
-    } else {
-    }
-  // ignore: empty_catches
-  } catch (e) {
+        setState(() {
+          _imageUrls = imageUrls;
+        });
+      } else {}
+      // ignore: empty_catches
+    } catch (e) {}
   }
-}
-
 
   void _filterSearchResults(String query) {
     List<String> filteredList = [];
@@ -328,7 +321,12 @@ Future<void> _fetchImages() async {
   }
 
   Widget _buildSearch() {
-    return Padding(
+    return Container( 
+      decoration: BoxDecoration(
+        color: Colors.white70.withOpacity(0.8),
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextField(
         controller: _searchController,
@@ -341,7 +339,7 @@ Future<void> _fetchImages() async {
           ),
         ),
       ),
-    );
+    ),);
   }
 
   Widget _buildButtons() {
@@ -373,20 +371,15 @@ Future<void> _fetchImages() async {
   }
 
   Widget _buildSearchResults() {
-  if (_filteredData.isEmpty) {
-    return const CircularProgressIndicator();
-  } else {
-    return ListView.builder(
-      shrinkWrap: true,
-      itemCount: _filteredData.length,
-      itemBuilder: (BuildContext context, int index) {
-        final String result = _filteredData[index];
-        return InkWell(
-          onTap: () {
-            _handleResultSelected(result);
-          },
-          child: MouseRegion(
-            cursor: SystemMouseCursors.click,
+    if (_filteredData.isEmpty) {
+      return const CircularProgressIndicator();
+    } else {
+      return ListView.builder(
+        shrinkWrap: true,
+        itemCount: _filteredData.length,
+        itemBuilder: (BuildContext context, int index) {
+          final String result = _filteredData[index];
+          return InkWell(
             child: ListTile(
               title: Text(
                 result,
@@ -403,29 +396,33 @@ Future<void> _fetchImages() async {
                     )
                   : const SizedBox(), // Placeholder widget if the image URL is null
             ),
-          ),
-        );
-      },
-    );
+            onTap: () {
+              _handleResultSelected(result);
+            },
+          );
+        },
+      );
+    }
   }
-}
-
-
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            _buildLogo(),
-            _buildCarousel(),
-            _buildSearch(),
-            _buildButtons(),
-            _buildSearchResults(),
-          ],
-        ),
+      body: Stack(
+        children: <Widget>[
+          
+          SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                _buildLogo(),
+                _buildCarousel(),
+                _buildSearch(),
+                _buildButtons(),
+                _buildSearchResults(),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

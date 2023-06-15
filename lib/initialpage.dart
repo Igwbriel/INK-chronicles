@@ -209,11 +209,6 @@ class DataService {
     });
   }
 
-  void carregarMoreItems() {
-    quantidadeItens >= 1000;
-    carregar(currentIndex); // Utiliza o índice da aba atual
-  }
-
   // Função para exibir a tela de informações do personagem
 
   void showCharacterInfoDialog(
@@ -413,7 +408,6 @@ class _ApisState extends State<Apis> {
                   dataObjects: value['dataObjects'],
                   propertyNames: dataService.chaves,
                   columnNames: dataService.colunas,
-                  loadMoreItems: dataService.carregarMoreItems,
                   currentIndex: currentIndex, // Passa o índice da aba atual
                 );
               case TableStatus.error:
@@ -468,14 +462,12 @@ class InfiniteScrollWidget extends StatefulWidget {
   final List<dynamic> dataObjects;
   final List<String> propertyNames;
   final List<String> columnNames;
-  final VoidCallback loadMoreItems;
   int currentIndex = 0;
 
   InfiniteScrollWidget({super.key, 
     required this.dataObjects,
     required this.propertyNames,
     required this.columnNames,
-    required this.loadMoreItems,
     required this.currentIndex,
   });
 
@@ -508,9 +500,9 @@ class _InfiniteScrollWidgetState extends State<InfiniteScrollWidget> {
         !_scrollController.position.outOfRange) {
       if (!_isLoading && widget.currentIndex == currentIndex) {
         setState(() {
-          _isLoading = true;
+          _isLoading = false;
         });
-        widget.loadMoreItems();
+
       }
     }
   }
@@ -518,7 +510,9 @@ class _InfiniteScrollWidgetState extends State<InfiniteScrollWidget> {
   @override
   Widget build(BuildContext context) {
     currentIndex = widget.currentIndex;
-    return SingleChildScrollView(
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: SingleChildScrollView(
       controller: _scrollController,
       child: Container(
         padding: const EdgeInsets.only(
@@ -541,7 +535,7 @@ class _InfiniteScrollWidgetState extends State<InfiniteScrollWidget> {
           ],
         ),
       ),
-    );
+    ),);
   }
 }
 
@@ -612,11 +606,4 @@ class DataTableWidget extends StatelessWidget {
 }
 
 
-void main() {
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
 
-  runApp(const Apis());
-}
