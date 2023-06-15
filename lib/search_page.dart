@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:ink_chronicles/matrial/material_color.dart';
+import 'package:ink_chronicles/material/material_color.dart';
 import 'initialpage.dart';
 import 'dart:convert';
 

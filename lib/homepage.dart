@@ -1,8 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:ink_chronicles/matrial/material_color.dart';
+import 'material/material_color.dart';
 
-class Homepage extends StatelessWidget {
+class Homepage extends StatefulWidget {
   const Homepage({Key key = const ValueKey('homepage')}) : super(key: key);
+
+  @override
+  _HomepageState createState() => _HomepageState();
+}
+
+class _HomepageState extends State<Homepage> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _loginController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final RegExp passwordLenex = RegExp(
+    r'^.{8,}$',
+  );
+  final RegExp passwordUpeex = RegExp(
+    r'^.(?=.*[A-Z])',
+  );
+  final RegExp passwordNumex = RegExp(
+    r'^.(?=.*[0-9])',
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -22,58 +40,104 @@ class Homepage extends StatelessWidget {
             ),
             Center(
               child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: <Widget>[
-                    Image.asset('assets/images/inkLogo.png'),
-                    SizedBox(
-                      width: size.width * 0.8,
-                      child: Column(
-                        children: [
-                          const TextField(
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Colors
-                                  .white, // Cor de fundo do campo de login
-                              hintText: 'Login',
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          const TextField(
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Colors
-                                  .white70, // Cor de fundo do campo de senha
-                              hintText: 'Password',
-                            ),
-                            obscureText:
-                                true, // Oculta o texto digitado (senha)
-                          ),
-                          const SizedBox(height: 10),
-                          ElevatedButton(
-                            onPressed: () {
-                              Navigator.pushNamed(context, 'Search');
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.black, // Cor de fundo transparente
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 20, horizontal: 40),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(
-                                    18.0), // Borda arredondada
-                                side: const BorderSide(
-                                    color: Colors.black), // Cor da borda
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      Image.asset('assets/images/inkLogo.png'),
+                      SizedBox(
+                        width: size.width * 0.8,
+                        child: Column(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white70.withOpacity(0.8),
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              child: TextFormField(
+                                controller: _loginController,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter your login';
+                                  }
+                                  if (!passwordNumex.hasMatch(value)) {
+                                    return 'Login must have at one number';
+                                  }
+                                  return null;
+                                },
+                                decoration: const InputDecoration(
+                                  filled: true,
+                                  fillColor: Colors.white70,
+                                  hintText: 'Login',
+                                  border: InputBorder.none,
+                                  errorStyle: TextStyle(
+                                    color: Colors.red,
+                                  ),
+                                ),
                               ),
                             ),
-                            child: const Text(
-                              'Enter',
-                              style: TextStyle(fontSize: 50),
+                            const SizedBox(height: 10),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white70.withOpacity(0.8),
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              child: TextFormField(
+                                controller: _passwordController,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter your password';
+                                  }
+                                  if (!passwordLenex.hasMatch(value)) {
+                                    return 'Password must have at least 8 characters';
+                                  }
+                                  if (!passwordUpeex.hasMatch(value)) {
+                                    return 'Password must have at one uppercase letter';
+                                  }
+                                  if (!passwordNumex.hasMatch(value)) {
+                                    return 'Password must have at one number';
+                                  }
+                                  return null;
+                                },
+                                obscureText: true,
+                                decoration: const InputDecoration(
+                                  filled: true,
+                                  fillColor: Colors.white70,
+                                  hintText: 'Password',
+                                  border: InputBorder.none,
+                                  errorStyle: TextStyle(
+                                    color: Colors.red,
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 10),
+                            ElevatedButton(
+                              onPressed: () {
+                                if (_formKey.currentState!.validate()) {
+                                  Navigator.pushNamed(context, 'Search');
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.black,
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 20, horizontal: 40),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(18.0),
+                                  side: const BorderSide(color: Colors.black),
+                                ),
+                              ),
+                              child: const Text(
+                                'Enter',
+                                style: TextStyle(fontSize: 50),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

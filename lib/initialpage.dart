@@ -262,7 +262,88 @@ class DataService {
       },
     );
   }
+
+  void showIssuesInfoDialog(
+    BuildContext context, Map<String, dynamic> issue) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Name: ${issue['name'] ?? ''}'),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Image.network(
+                  issue['image'] ?? '',
+                  width: 125, // Defina a largura desejada da imagem
+                  height: 125, // Defina a altura desejada da imagem
+                  fit: BoxFit.contain, // Para manter a proporção da imagem
+                ),
+                const SizedBox(height: 8.0),
+                Text('Name: ${issue['name'] ?? ''}'),
+                const SizedBox(height: 8.0),
+                Text('Volume: ${issue['volume'] ?? ''}'),
+                const SizedBox(height: 8.0),
+                Text('Number: ${issue['issue_number'] ?? ''}'),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showPublishersInfoDialog(
+    BuildContext context, Map<String, dynamic> publisher) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Name: ${publisher['name'] ?? ''}'),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Image.network(
+                  publisher['image'] ?? '',
+                  width: 125, // Defina a largura desejada da imagem
+                  height: 125, // Defina a altura desejada da imagem
+                  fit: BoxFit.contain, // Para manter a proporção da imagem
+                ),
+                const SizedBox(height: 8.0),
+                Text('Name: ${publisher['name'] ?? ''}'),
+                const SizedBox(height: 8.0),
+                Text('State: ${publisher['location_state'] ?? ''}'),
+                const SizedBox(height: 8.0),
+                Text('City: ${publisher['location_city'] ?? ''}'),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 }
+
+
 
 final dataService = DataService();
 
@@ -501,6 +582,12 @@ class DataTableWidget extends StatelessWidget {
             onTap: () {
               if (currentIndex == 0) {
                 dataService.showCharacterInfoDialog(context, jsonObject);
+              }
+              if (currentIndex == 1) {
+                dataService.showIssuesInfoDialog(context, jsonObject);
+              }
+              if (currentIndex == 2) {
+                dataService.showPublishersInfoDialog(context, jsonObject);
               }
             },
             child: Column(
