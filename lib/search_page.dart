@@ -381,29 +381,36 @@ Future<void> _fetchImages() async {
       itemCount: _filteredData.length,
       itemBuilder: (BuildContext context, int index) {
         final String result = _filteredData[index];
-        return GestureDetector(
+        return InkWell(
           onTap: () {
             _handleResultSelected(result);
           },
-          child: ListTile(
-            title: Text(result, style: const TextStyle(
-                fontSize: 16.0,
-                decoration: TextDecoration.underline,
-              ),),
-            leading: _characterImageMap[result] != null
-    ? Image.network(
-        _characterImageMap[result]!, // Use the mapped image URL
-        width: 50,
-        height: 50,
-      )
-    : const SizedBox(), // Placeholder widget if the image URL is null
-
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: ListTile(
+              title: Text(
+                result,
+                style: const TextStyle(
+                  fontSize: 16.0,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+              leading: _characterImageMap[result] != null
+                  ? Image.network(
+                      _characterImageMap[result]!, // Use the mapped image URL
+                      width: 50,
+                      height: 50,
+                    )
+                  : const SizedBox(), // Placeholder widget if the image URL is null
+            ),
           ),
         );
       },
     );
   }
 }
+
+
 
 
   @override
