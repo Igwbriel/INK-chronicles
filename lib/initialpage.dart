@@ -12,7 +12,9 @@ class DataService {
   int currentIndex = 0;
   final ValueNotifier<Map<String, dynamic>> tableStateNotifier =
       ValueNotifier({'status': TableStatus.idle, 'dataObjects': []});
-  List<Map<String, dynamic>> currentDataObjects = [];
+  List<Map<String, dynamic>> currentDataObjectsCharacteres = [];
+  List<Map<String, dynamic>> currentDataObjectsIssues = [];
+  List<Map<String, dynamic>> currentDataObjectsPublishers = [];
   var chaves = ["name", "style", "ibu"];
   var colunas = ["Nome", "Estilo", "IBU"];
   var quantidadeItens = 100;
@@ -113,10 +115,10 @@ class DataService {
         };
       }).toList();
 
-      currentDataObjects.addAll(extractedCharactersJson);
+      currentDataObjectsCharacteres.addAll(extractedCharactersJson);
       tableStateNotifier.value = {
         'status': TableStatus.ready,
-        'dataObjects': currentDataObjects,
+        'dataObjects': currentDataObjectsCharacteres,
         'propertyNames': ["name", "origin", "publisher", "image"],
       };
 
@@ -157,10 +159,11 @@ class DataService {
           'image': image,
         };
       }).toList();
-
+      
+      currentDataObjectsIssues.addAll(extractedIssuesJson);
       tableStateNotifier.value = {
         'status': TableStatus.ready,
-        'dataObjects': extractedIssuesJson,
+        'dataObjects': currentDataObjectsIssues,
         'propertyNames': ["name", "volume", "deck", "issue_number", "image"],
       };
 
@@ -201,9 +204,11 @@ class DataService {
         };
       }).toList();
 
+      currentDataObjectsPublishers.addAll(extractedPublishersJson);
+
       tableStateNotifier.value = {
         'status': TableStatus.ready,
-        'dataObjects': extractedPublishersJson,
+        'dataObjects': currentDataObjectsPublishers,
         'propertyNames': ["name", "location_state", "location_city", "image"],
       };
 
@@ -390,7 +395,7 @@ class InfiniteScrollWidget extends HookWidget {
 
   final _scrollController = ScrollController();
   int page = 1;
-  final int _previousScrollPosition = 0;
+  double _previousScrollPosition = 0.0;
 
   @override
   Widget build(BuildContext context) {
@@ -398,9 +403,9 @@ class InfiniteScrollWidget extends HookWidget {
       _scrollController.addListener(() {
         if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
           page++;
-          if (dataService.currentIndex == 0) {
+          if (index== 0) {
             dataService.carregarCharacters(page);
-          } else if (dataService.currentIndex == 1) {
+          } else if (index== 1) {
             dataService.carregarIssues(page);
           } else if (dataService.currentIndex == 2) {
             dataService.carregarPublishers(page);
@@ -451,47 +456,52 @@ class InfiniteScrollWidget extends HookWidget {
       );
     }
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_previousScrollPosition > 0) {
-        _scrollController.jumpTo(_previousScrollPosition as double);
+        _scrollController.jumpTo(_previousScrollPosition);
       }
     });
+    _scrollController.addListener(() {
+      _previousScrollPosition = _scrollController.position.pixels;
+    });
     
-    return ListView.builder(
-      controller: _scrollController,
-      itemCount: dataObjects.length + 1,
-      itemBuilder: (context, index) {
-        if (index == dataObjects.length) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+
+
+return ListView.builder(
+  controller: _scrollController,
+  itemCount: dataObjects.length + 1,
+  itemBuilder: (context, index) {
+    if (index == dataObjects.length) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    final dataObject = dataObjects[index];
+    return InkWell(
+      onTap: () {
+        if (dataService.currentIndex == 0) {
+          dataService.showCharacterInfoDialog(context, dataObject);
+        } else if (dataService.currentIndex == 1) {
+          dataService.showIssueInfoDialog(context, dataObject);
+        } else if (dataService.currentIndex == 2) {
+          dataService.showPublisherInfoDialog(context, dataObject);
         }
-        
-        final dataObject = dataObjects[index];
-        return InkWell(
-          onTap: () {
-            if (dataService.currentIndex == 0) {
-              dataService.showCharacterInfoDialog(context, dataObject);
-            } else
-            if (dataService.currentIndex == 1) {
-              dataService.showIssueInfoDialog(context, dataObject);
-            } else
-            if (dataService.currentIndex == 2) {
-              dataService.showPublisherInfoDialog(context, dataObject);
-            }
-          },
-          child: ListTile(
-            leading: Image.network(
-              dataObject['image'],
-              height: 40,
-              width: 40,
-            ),
-            title: Text(dataObject[propertyNames[0]]),
-            subtitle: Text(dataObject[propertyNames[1]]),
-          ),
-        );
       },
+      child: ListTile(
+        leading: Image.network(
+          dataObject['image'],
+          height: 40,
+          width: 40,
+        ),
+        title: Text(dataObject[propertyNames[0]]),
+        subtitle: Text(dataObject[propertyNames[1]]),
+      ),
     );
+  },
+);
+
+
   }
 }
 
