@@ -42,6 +42,7 @@ class _ResultDetailPageState extends State<ResultDetailPage> {
   var colunas = ["Nome", "Estilo", "IBU"];
 
   Widget searchCharacters(String? nameSearch) {
+    int page = 1;
     final ValueNotifier<Map<String, dynamic>> tableStateNotifier =
         ValueNotifier({'status': TableStatus.idle, 'dataObjects': []});
     tableStateNotifier.value = {
@@ -77,9 +78,10 @@ class _ResultDetailPageState extends State<ResultDetailPage> {
       host: 'comicvine.gamespot.com',
       path: 'api/characters',
       queryParameters: {
-        //'limit': 100, // Adjust this value accordingly
+        'offset': ((page - 1) * data.quantidadeItens).toString(),
+        'limit': data.quantidadeItens.toString(),
         'api_key': '75504a0c3fdb9bb78d69b682d9e39fa478d71195',
-        'format': 'json',
+        'format': 'json'
       },
     );
 
@@ -95,37 +97,39 @@ class _ResultDetailPageState extends State<ResultDetailPage> {
         } else {
           var charactersJson = jsonDecode(snapshot.data!)['results'];
 
-          var extractedCharactersJson = charactersJson.map((character) {
-            final name = character['name'] ?? '';
-            final origin =
-                character['origin'] != null ? character['origin']['name'] : '';
-            final publisher = character['publisher'] != null
-                ? character['publisher']['name']
-                : '';
-            final image = character['image'] != null
-                ? character['image']['icon_url']
-                : '';
-            final realName = character['real_name'] ?? '';
-            final ID = character['id'] ?? '';
-            final contagem = character['count_of_issue_appearances'] ?? '';
-            final resumo = character['deck'] ?? '';
+          var extractedCharactersJson =
+          charactersJson.map<Map<String, dynamic>>((character) {
+        final name = character['name'] ?? '';
+        final origin =
+            character['origin'] != null ? character['origin']['name'] : '';
+        final publisher = character['publisher'] != null
+            ? character['publisher']['name']
+            : '';
+        final image =
+            character['image'] != null ? character['image']['icon_url'] : '';
+        final realName = character['real_name'] ?? '';
+        final ID = character['id'] ?? '';
+        final contagem = character['count_of_issue_appearances'] ?? '';
+        final resumo = character['deck'] ?? '';
 
-            return {
-              'name': name,
-              'origin': origin,
-              'publisher': publisher,
-              'image': image,
-              'real_name': realName,
-              'id': ID,
-              'count_of_issue_appearances': contagem,
-              'deck': resumo,
-            };
-          }).toList();
-          tableStateNotifier.value = {
-            'status': TableStatus.ready,
-            'dataObjects': extractedCharactersJson,
-            'propertyNames': ["name", "origin", "publisher", "image"],
-          };
+        return {
+          'name': name,
+          'origin': origin,
+          'publisher': publisher,
+          'image': image,
+          'real_name': realName,
+          'count_of_issue_appearances': contagem,
+          'deck': resumo,
+          'ID': ID,
+        };
+      }).toList();
+
+      data.currentDataObjectsCharacteres.addAll(extractedCharactersJson);
+      tableStateNotifier.value = {
+        'status': TableStatus.ready,
+        'dataObjects': data.currentDataObjectsCharacteres,
+        'propertyNames': ["name", "origin", "publisher", "image"],
+      };
 
           var filteredCharactersJson = extractedCharactersJson
               .where((character) => character['name'] == (widget.result))

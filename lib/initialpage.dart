@@ -17,7 +17,7 @@ class DataService {
   List<Map<String, dynamic>> currentDataObjectsPublishers = [];
   var chaves = ["name", "style", "ibu"];
   var colunas = ["Nome", "Estilo", "IBU"];
-  var quantidadeItens = 100;
+  var quantidadeItens = 20;
 
   void columnCharacters() {
     currentIndex = 0;
@@ -430,12 +430,15 @@ class InfiniteScrollWidget extends HookWidget {
     }
 
     if (tableStatus == TableStatus.loading && dataObjects.isEmpty) {
-      return Center(
-        child: Image.asset(
-          'assets/images/loading_animation.gif',
-          width: 400.0, // Customize the color if desired
-        ),
-      );
+       return Container(
+    color: Colors.white54, // Defina a cor de fundo desejada
+    child: Center(
+      child: Image.asset(
+        'assets/images/loading_animation.gif',
+        width: 400.0,
+      ),
+    ),
+  );
     }
 
     if (tableStatus == TableStatus.idle && dataObjects.isEmpty) {

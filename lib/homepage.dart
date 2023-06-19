@@ -22,6 +22,13 @@ class _HomepageState extends State<Homepage> {
   final RegExp passwordNumex = RegExp(
     r'^.(?=.*[0-9])',
   );
+  final RegExp loginValiAx = RegExp(
+    r'^.(?=.*[@])',
+  );
+  final RegExp loginValiComx = RegExp(
+    r'^.(?=.*[.,c,o,m])',
+  );
+  
 
   @override
   Widget build(BuildContext context) {
@@ -60,17 +67,21 @@ class _HomepageState extends State<Homepage> {
                                 controller: _loginController,
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return 'Please enter your login';
+                                    return 'Please enter your E-mail';
                                   }
-                                  if (!passwordNumex.hasMatch(value)) {
-                                    return 'Login must have at one number';
+                                  
+                                  if (!loginValiComx.hasMatch(value)) {
+                                    return 'E-mail invalid insert .com';
+                                  }
+                                  if (!loginValiAx.hasMatch(value)) {
+                                    return 'E-mail invalid insert @';
                                   }
                                   return null;
                                 },
                                 decoration: const InputDecoration(
                                   filled: true,
                                   fillColor: Colors.white70,
-                                  hintText: 'Login',
+                                  hintText: 'E-mail',
                                   border: InputBorder.none,
                                   errorStyle: TextStyle(
                                     color: Colors.red,
