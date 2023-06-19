@@ -1,7 +1,6 @@
 // ignore_for_file: must_be_immutable, non_constant_identifier_names, library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -13,10 +12,10 @@ class DataService {
   int currentIndex = 0;
   final ValueNotifier<Map<String, dynamic>> tableStateNotifier =
       ValueNotifier({'status': TableStatus.idle, 'dataObjects': []});
-
+  List<Map<String, dynamic>> currentDataObjects = [];
   var chaves = ["name", "style", "ibu"];
   var colunas = ["Nome", "Estilo", "IBU"];
-  var quantidadeItens = 1000;
+  var quantidadeItens = 100;
 
   void columnCharacters() {
     currentIndex = 0;
@@ -54,7 +53,7 @@ class DataService {
     colunas = ["Nome", "Estado", "Cidade", "Logo"];
   }
 
-  void carregar(index) {
+  void carregar(index, {int page = 1}) {
     if (isLoading[index]) return;
     final funcoes = [
       carregarCharacters,
@@ -66,10 +65,10 @@ class DataService {
       'dataObjects': [],
       'columnNames': [],
     };
-    funcoes[index]();
+    funcoes[index](page);
   }
 
-  void carregarCharacters() {
+  void carregarCharacters(int page) {
     columnCharacters();
     isLoading[0] = true;
     var charactersUri = Uri(
@@ -77,6 +76,7 @@ class DataService {
       host: 'comicvine.gamespot.com',
       path: 'api/characters',
       queryParameters: {
+        'offset': ((page - 1) * quantidadeItens).toString(),
         'limit': quantidadeItens.toString(),
         'api_key': '75504a0c3fdb9bb78d69b682d9e39fa478d71195',
         'format': 'json'
@@ -86,7 +86,8 @@ class DataService {
     http.read(charactersUri).then((jsonString) {
       var charactersJson = jsonDecode(jsonString)['results'];
 
-      var extractedCharactersJson = charactersJson.map((character) {
+      var extractedCharactersJson =
+          charactersJson.map<Map<String, dynamic>>((character) {
         final name = character['name'] ?? '';
         final origin =
             character['origin'] != null ? character['origin']['name'] : '';
@@ -106,22 +107,24 @@ class DataService {
           'publisher': publisher,
           'image': image,
           'real_name': realName,
-          'id': ID,
           'count_of_issue_appearances': contagem,
           'deck': resumo,
+          'ID': ID,
         };
       }).toList();
 
+      currentDataObjects.addAll(extractedCharactersJson);
       tableStateNotifier.value = {
         'status': TableStatus.ready,
-        'dataObjects': extractedCharactersJson,
+        'dataObjects': currentDataObjects,
         'propertyNames': ["name", "origin", "publisher", "image"],
       };
+
       isLoading[0] = false;
     });
   }
 
-  void carregarIssues() {
+  void carregarIssues(int page) {
     columnIssues();
     isLoading[1] = true;
     var issuesUri = Uri(
@@ -129,6 +132,7 @@ class DataService {
       host: 'comicvine.gamespot.com',
       path: 'api/issues',
       queryParameters: {
+        'offset': ((page - 1) * quantidadeItens).toString(),
         'limit': quantidadeItens.toString(),
         'api_key': '75504a0c3fdb9bb78d69b682d9e39fa478d71195',
         'format': 'json'
@@ -138,18 +142,18 @@ class DataService {
     http.read(issuesUri).then((jsonString) {
       var issuesJson = jsonDecode(jsonString)['results'];
 
-      var extractedIssuesJson = issuesJson.map((issue) {
+      var extractedIssuesJson = issuesJson.map<Map<String, dynamic>>((issue) {
         final name = issue['name'] ?? '';
-        final vol = issue['volume'] != null ? issue['volume']['name'] : '';
-        final numero = issue['issue_number'] ?? '';
+        final volume = issue['volume'] != null ? issue['volume']['name'] : '';
+        final deck = issue['deck'] ?? '';
+        final issueNumber = issue['issue_number'] ?? '';
         final image = issue['image'] != null ? issue['image']['icon_url'] : '';
-        final about = issue['deck'] ?? '';
 
         return {
           'name': name,
-          'volume': vol,
-          'deck': about,
-          'issue_number': numero,
+          'volume': volume,
+          'deck': deck,
+          'issue_number': issueNumber,
           'image': image,
         };
       }).toList();
@@ -157,18 +161,14 @@ class DataService {
       tableStateNotifier.value = {
         'status': TableStatus.ready,
         'dataObjects': extractedIssuesJson,
-        'propertyNames': [
-          "name",
-          "first_appeared_in_issue",
-          "publisher",
-          "image"
-        ],
+        'propertyNames': ["name", "volume", "deck", "issue_number", "image"],
       };
+
       isLoading[1] = false;
     });
   }
 
-  void carregarPublishers() {
+  void carregarPublishers(int page) {
     columnPublishers();
     isLoading[2] = true;
     var publishersUri = Uri(
@@ -176,6 +176,7 @@ class DataService {
       host: 'comicvine.gamespot.com',
       path: 'api/publishers',
       queryParameters: {
+        'offset': ((page - 1) * quantidadeItens).toString(),
         'limit': quantidadeItens.toString(),
         'api_key': '75504a0c3fdb9bb78d69b682d9e39fa478d71195',
         'format': 'json'
@@ -185,7 +186,7 @@ class DataService {
     http.read(publishersUri).then((jsonString) {
       var publishersJson = jsonDecode(jsonString)['results'];
 
-      var extractedPublishersJson = publishersJson.map((publisher) {
+      var extractedPublishersJson = publishersJson.map<Map<String, dynamic>>((publisher) {
         final name = publisher['name'] ?? '';
         final locationState = publisher['location_state'] ?? '';
         final locationCity = publisher['location_city'] ?? '';
@@ -205,52 +206,40 @@ class DataService {
         'dataObjects': extractedPublishersJson,
         'propertyNames': ["name", "location_state", "location_city", "image"],
       };
+
       isLoading[2] = false;
     });
   }
 
-  // Função para exibir a tela de informações do personagem
-
-  void showCharacterInfoDialog(
-      BuildContext context, Map<String, dynamic> character) {
+  void showCharacterInfoDialog(BuildContext context, jsonObject) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Name: ${character['name'] ?? ''}'),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Image.network(
-                  character['image'] ?? '',
-                  width: 125, // Defina a largura desejada da imagem
-                  height: 125, // Defina a altura desejada da imagem
-                  fit: BoxFit.contain, // Para manter a proporção da imagem
-                ),
-                const SizedBox(height: 8.0),
-                Text('Identity: ${character['real_name'] ?? ''}'),
-                const SizedBox(height: 8.0),
-                Text('Race: ${character['origin'] ?? ''}'),
-                const SizedBox(height: 8.0),
-                Text('publisher: ${character['publisher'] ?? ''}'),
-                const SizedBox(height: 8.0),
-                Text(
-                    'appearances: ${character['count_of_issue_appearances'] ?? ''}'),
-                const SizedBox(height: 8.0),
-                Text('ID: ${character['id'] ?? ''}'),
-                const SizedBox(height: 8.0),
-                Text('About: ${character['deck'] ?? ''}'),
-                const SizedBox(height: 8.0),
-              ],
-            ),
+          title: Text(jsonObject['name']),
+          content: Column(
+            children: [
+              Image.network(jsonObject['image']),
+              const SizedBox(height: 8.0),
+              Text('Identity: ${jsonObject['real_name']}'),
+              const SizedBox(height: 8.0),
+              Text('Origin: ${jsonObject['origin']}'),
+              const SizedBox(height: 8.0),
+              Text('Publisher: ${jsonObject['publisher']}'),
+              const SizedBox(height: 8.0),
+              Text('Appearances: ${jsonObject['count_of_issue_appearances']}'),
+              const SizedBox(height: 8.0),
+              Text('About: ${jsonObject['deck']}'),
+              const SizedBox(height: 8.0),
+              // Adicione mais informações que desejar
+            ],
           ),
           actions: [
-            TextButton(
-              child: const Text('Close'),
+            ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
+              child: const Text('Close'),
             ),
           ],
         );
@@ -258,38 +247,31 @@ class DataService {
     );
   }
 
-  void showIssuesInfoDialog(
-    BuildContext context, Map<String, dynamic> issue) {
+  void showIssueInfoDialog(BuildContext context, jsonObject) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Name: ${issue['name'] ?? ''}'),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Image.network(
-                  issue['image'] ?? '',
-                  width: 125, // Defina a largura desejada da imagem
-                  height: 125, // Defina a altura desejada da imagem
-                  fit: BoxFit.contain, // Para manter a proporção da imagem
-                ),
-                const SizedBox(height: 8.0),
-                Text('Name: ${issue['name'] ?? ''}'),
-                const SizedBox(height: 8.0),
-                Text('Volume: ${issue['volume'] ?? ''}'),
-                const SizedBox(height: 8.0),
-                Text('Number: ${issue['issue_number'] ?? ''}'),
-              ],
-            ),
+          title: Text(jsonObject['name']),
+          content: Column(
+            children: [
+              Image.network(jsonObject['image']),
+              const SizedBox(height: 8.0),
+              Text('Name: ${jsonObject['name']}'),
+              const SizedBox(height: 8.0),
+              Text('Volume: ${jsonObject['volume']}'),
+              const SizedBox(height: 8.0),
+              Text('Number: ${jsonObject['issue_number']}'),
+              const SizedBox(height: 8.0),
+              // Adicione mais informações que desejar
+            ],
           ),
           actions: [
-            TextButton(
-              child: const Text('Close'),
+            ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
+              child: const Text('Close'),
             ),
           ],
         );
@@ -297,248 +279,221 @@ class DataService {
     );
   }
 
-  void showPublishersInfoDialog(
-    BuildContext context, Map<String, dynamic> publisher) {
+  void showPublisherInfoDialog(BuildContext context, jsonObject) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Name: ${publisher['name'] ?? ''}'),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Image.network(
-                  publisher['image'] ?? '',
-                  width: 125, // Defina a largura desejada da imagem
-                  height: 125, // Defina a altura desejada da imagem
-                  fit: BoxFit.contain, // Para manter a proporção da imagem
-                ),
-                const SizedBox(height: 8.0),
-                Text('Name: ${publisher['name'] ?? ''}'),
-                const SizedBox(height: 8.0),
-                Text('State: ${publisher['location_state'] ?? ''}'),
-                const SizedBox(height: 8.0),
-                Text('City: ${publisher['location_city'] ?? ''}'),
-              ],
-            ),
+          title: Text(jsonObject['name']),
+          content: Column(
+            children: [
+              Image.network(jsonObject['image']),
+              const SizedBox(height: 8.0),
+              Text('Name: ${jsonObject['name']}'),
+              const SizedBox(height: 8.0),
+              Text('State: ${jsonObject['location_state']}'),
+              const SizedBox(height: 8.0),
+              Text('City: ${jsonObject['location_city']}'),
+              const SizedBox(height: 8.0),
+              // Add more information as desired
+            ],
           ),
           actions: [
-            TextButton(
-              child: const Text('Close'),
+            ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
+              child: const Text('Close'),
             ),
           ],
         );
       },
     );
   }
-
 }
-
-
 
 final dataService = DataService();
 
 class Apis extends StatefulWidget {
-  const Apis({super.key});
+  const Apis({Key? key}) : super(key: key);
 
   @override
-  _ApisState createState() {
-    return _ApisState();
-  }
+  _ApisState createState() => _ApisState();
 }
 
 class _ApisState extends State<Apis> {
-  int currentIndex = 0; // Variável para armazenar o índice da aba atual
-  List<bool> isLoading = [
-    false,
-    false,
-    false
-  ]; // Estado de carregamento de cada aba
+  final DataService dataService = DataService();
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          selectedItemColor: Colors.red,
-          unselectedItemColor: Colors.red.withOpacity(0.5),
-        ),
-      ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            "INK-CHRONICLES 🦸‍♂️",
-            style: TextStyle(
-              color: Colors.black,
-            ),
-          ),
-          backgroundColor: Colors.blue,
-        ),
-        body: ValueListenableBuilder(
-          valueListenable: dataService.tableStateNotifier,
-          builder: (_, value, __) {
-            switch (value['status']) {
-              case TableStatus.idle:
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        'assets/images/inkLogo.png',
-                        width: 200.0,
-                      ),
-                      const SizedBox(height: 16.0),
-                    ],
-                  ),
-                );
-              case TableStatus.loading:
-                return Center(
-                  child: Image.asset(
-                    'assets/images/loading_animation.gif',
-                    width: 400.0,
-                  ),
-                );
-              case TableStatus.ready:
-                return InfiniteScrollWidget(
-                  dataObjects: value['dataObjects'],
-                  propertyNames: dataService.chaves,
-                  columnNames: dataService.colunas,
-                  currentIndex: currentIndex, // Passa o índice da aba atual
-                );
-              case TableStatus.error:
-                return const Text("Lascou");
-            }
-            return const Text("...");
-          },
-        ),
-        bottomNavigationBar: NewNavBar(
-          itemSelectedCallback: (index) {
-            setState(() {
-              currentIndex = index; // Atualiza o índice da aba atual
-            });
-            dataService.carregar(index);
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class NewNavBar extends HookWidget {
-  final _itemNames = ['Characters', 'Issues', 'Publishers'];
-  final _itemIcons = [Icons.person, Icons.book, Icons.house];
-
-  final Function(int) itemSelectedCallback;
-
-  NewNavBar({super.key, required this.itemSelectedCallback});
-
-  @override
-  Widget build(BuildContext context) {
-    final selectedItem = useState(0);
-
-    return BottomNavigationBar(
-      items: List.generate(
-        _itemNames.length,
-        (index) => BottomNavigationBarItem(
-          icon: Icon(_itemIcons[index]),
-          label: _itemNames[index],
-        ),
-      ),
-      currentIndex: selectedItem.value,
-      onTap: (index) {
-        selectedItem.value = index;
-        itemSelectedCallback(index);
-      },
-    );
-  }
-}
-
-class InfiniteScrollWidget extends StatefulWidget {
-  final List<dynamic> dataObjects;
-  final List<String> propertyNames;
-  final List<String> columnNames;
-  int currentIndex = 0;
-
-  InfiniteScrollWidget({super.key, 
-    required this.dataObjects,
-    required this.propertyNames,
-    required this.columnNames,
-    required this.currentIndex,
-  });
-
-  @override
-  _InfiniteScrollWidgetState createState() => _InfiniteScrollWidgetState();
-}
-
-class _InfiniteScrollWidgetState extends State<InfiniteScrollWidget> {
-  final ScrollController _scrollController = ScrollController();
-  bool _isLoading = false;
-  int currentIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    currentIndex = widget.currentIndex;
-    _scrollController.addListener(_scrollListener);
+    dataService.carregar(dataService.currentIndex);
   }
 
-  @override
-  void dispose() {
-    _scrollController.removeListener(_scrollListener);
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  void _scrollListener() {
-    if (_scrollController.offset >=
-            _scrollController.position.maxScrollExtent &&
-        !_scrollController.position.outOfRange) {
-      if (!_isLoading && widget.currentIndex == currentIndex) {
-        setState(() {
-          _isLoading = false;
-        });
-
-      }
+  void _onTabChanged(int index) {
+    if (dataService.currentIndex!= index) {
+      dataService.currentIndex = index;
+      dataService.carregar(dataService.currentIndex);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    currentIndex = widget.currentIndex;
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: SingleChildScrollView(
-      controller: _scrollController,
-      child: Container(
-        padding: const EdgeInsets.only(
-          bottom: 60,
-        ),
-        child: Column(
-          children: [
-            DataTableWidget(
-              jsonObjects: widget.dataObjects,
-              propertyNames: widget.propertyNames,
-              columnNames: widget.columnNames,
-              currentIndex: currentIndex,
+    return MaterialApp(
+      title: "INK-CHRONICLES 🦸‍♂️",
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: DefaultTabController(
+        length: 3,
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('INK-CHRONICLES 🦸‍♂️'),
+            bottom: TabBar(
+              tabs: const [
+                Tab(
+                  icon: Icon(Icons.person),
+                  text: 'Characters',
+                ),
+                Tab(
+                  icon: Icon(Icons.article),
+                  text: 'Issues',
+                ),
+                Tab(
+                  icon: Icon(Icons.business),
+                  text: 'Publishers',
+                ),
+              ],
+              onTap: _onTabChanged,
             ),
-            _isLoading
-                ? const Padding(
-                    padding: EdgeInsets.all(16),
-                    child: CircularProgressIndicator(),
-                  )
-                : Container(),
-          ],
+          ),
+          body: TabBarView(
+            children: [
+              InfiniteScrollWidget(dataService: dataService, index: 0),
+              InfiniteScrollWidget(dataService: dataService, index: 1),
+              InfiniteScrollWidget(dataService: dataService, index: 2),
+            ],
+          ),
         ),
       ),
-    ),);
+    );
   }
 }
 
+class InfiniteScrollWidget extends HookWidget {
+  final DataService dataService;
+  final int index;
+
+  InfiniteScrollWidget({Key? key, required this.dataService, required this.index})
+      : super(key: key);
+
+  final _scrollController = ScrollController();
+  int page = 1;
+  final int _previousScrollPosition = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    useEffect(() {
+      _scrollController.addListener(() {
+        if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
+          page++;
+          if (dataService.currentIndex == 0) {
+            dataService.carregarCharacters(page);
+          } else if (dataService.currentIndex == 1) {
+            dataService.carregarIssues(page);
+          } else if (dataService.currentIndex == 2) {
+            dataService.carregarPublishers(page);
+          }
+        }
+      });
+
+      return () {
+        _scrollController.removeListener(() {});
+      };
+    }, []);
+
+    final tableState = useValueListenable(dataService.tableStateNotifier);
+    final tableStatus = tableState['status'];
+    final dataObjects = tableState['dataObjects'];
+    final propertyNames = tableState['propertyNames'];
+
+    if (tableStatus == TableStatus.error) {
+      return const Center(
+        child: Text('An error occurred while loading the data.'),
+      );
+    }
+
+    if (tableStatus == TableStatus.loading && dataObjects.isEmpty) {
+      return Center(
+        child: Image.asset(
+          'assets/images/loading_animation.gif',
+          width: 400.0, // Customize the color if desired
+        ),
+      );
+    }
+
+    if (tableStatus == TableStatus.idle && dataObjects.isEmpty) {
+      return Center(
+        child: ElevatedButton(
+          onPressed: () {
+            page = 1;
+            if (dataService.currentIndex == 0) {
+              dataService.carregarCharacters(page);
+            } else if (dataService.currentIndex == 1) {
+              dataService.carregarIssues(page);
+            } else if (dataService.currentIndex == 2) {
+              dataService.carregarPublishers(page);
+            }
+          },
+          child: const Text('Load Data'),
+        ),
+      );
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_previousScrollPosition > 0) {
+        _scrollController.jumpTo(_previousScrollPosition as double);
+      }
+    });
+    
+    return ListView.builder(
+      controller: _scrollController,
+      itemCount: dataObjects.length + 1,
+      itemBuilder: (context, index) {
+        if (index == dataObjects.length) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        
+        final dataObject = dataObjects[index];
+        return InkWell(
+          onTap: () {
+            if (dataService.currentIndex == 0) {
+              dataService.showCharacterInfoDialog(context, dataObject);
+            } else
+            if (dataService.currentIndex == 1) {
+              dataService.showIssueInfoDialog(context, dataObject);
+            } else
+            if (dataService.currentIndex == 2) {
+              dataService.showPublisherInfoDialog(context, dataObject);
+            }
+          },
+          child: ListTile(
+            leading: Image.network(
+              dataObject['image'],
+              height: 40,
+              width: 40,
+            ),
+            title: Text(dataObject[propertyNames[0]]),
+            subtitle: Text(dataObject[propertyNames[1]]),
+          ),
+        );
+      },
+    );
+  }
+}
 
 class DataTableWidget extends StatelessWidget {
   final List<dynamic> jsonObjects;
@@ -578,10 +533,10 @@ class DataTableWidget extends StatelessWidget {
                 dataService.showCharacterInfoDialog(context, jsonObject);
               }
               if (currentIndex == 1) {
-                dataService.showIssuesInfoDialog(context, jsonObject);
+                dataService.showIssueInfoDialog(context, jsonObject);
               }
               if (currentIndex == 2) {
-                dataService.showPublishersInfoDialog(context, jsonObject);
+                dataService.showPublisherInfoDialog(context, jsonObject);
               }
             },
             child: Column(
@@ -604,6 +559,3 @@ class DataTableWidget extends StatelessWidget {
     );
   }
 }
-
-
-
