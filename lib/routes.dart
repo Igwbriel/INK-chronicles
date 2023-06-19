@@ -8,7 +8,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     
-    return MaterialApp(initialRoute: 'Initial'
+    return MaterialApp(initialRoute: '/'
     , routes: {
       '/': (context) => const Homepage(),
       'Initial': (context) => const Apis(),
